@@ -11,7 +11,9 @@ namespace OrthogonalConnectorRouting
 {
     public class ConnectorVM
     {
-        public ObservableCollection<DesignerItem> AllItems { get; private set; }
+        private IOrthogonalPathFinder _orthogonalPathFinder;
+
+        public ObservableCollection<DesignerItem> DesignerItems { get; private set; }
 
         public ObservableCollection<Connection> Connections { get; private set; }
 
@@ -19,38 +21,42 @@ namespace OrthogonalConnectorRouting
 
         public ConnectorVM()
         {
-            AllItems = new ObservableCollection<DesignerItem>();
-            Connections = new ObservableCollection<Connection>();
-            Intersections = new ObservableCollection<Point>();
+            this.DesignerItems = new ObservableCollection<DesignerItem>();
+            this.Connections = new ObservableCollection<Connection>();
+            this.Intersections = new ObservableCollection<Point>();
 
-            AllItems.Add(new DesignerItem { X = 50, Y = 150, Height = 50, Width = 130 });
-            AllItems.Add(new DesignerItem { X = 400, Y = 130, Height = 50, Width = 130 });
-            AllItems.Add(new DesignerItem { X = 440, Y = 50, Height = 50, Width = 150 });
-            AllItems.Add(new DesignerItem { X = 420, Y = 270, Height = 50, Width = 130 });
-            AllItems.Add(new DesignerItem { X = 270, Y = 110, Height = 150, Width = 50 });
+            // Add testing blocks
+            this.DesignerItems.Add(new DesignerItem { X = 50, Y = 150, Height = 50, Width = 130 });
+            this.DesignerItems.Add(new DesignerItem { X = 400, Y = 130, Height = 50, Width = 130 });
+            this.DesignerItems.Add(new DesignerItem { X = 440, Y = 50, Height = 50, Width = 150 });
+            this.DesignerItems.Add(new DesignerItem { X = 420, Y = 270, Height = 50, Width = 130 });
+            this.DesignerItems.Add(new DesignerItem { X = 270, Y = 110, Height = 150, Width = 50 });
 
-            OrthogonalPathFinder pathFinder = new OrthogonalPathFinder();
+            this._orthogonalPathFinder = new OrthogonalPathFinder();
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            Connections = new ObservableCollection<Connection> (pathFinder.CreateLeadLines(AllItems.ToList(), 800, 450));
-
-            foreach (var conn in Connections)
+            this.Connections = new ObservableCollection<Connection>(this._orthogonalPathFinder.CreateLeadLines(
+                                                                                DesignerItems.ToList(), 800, 450));
+            foreach (var conn in this.Connections)
             {
-                foreach (var conn2 in Connections)
+                foreach (var conn2 in this.Connections)
                 {
-                    if (conn == conn2) continue;
+                    if (conn == conn2)
+                    { 
+                        continue;
+                    }
 
-                    var intersection = pathFinder.FindIntersection(conn, conn2);
-                    if (intersection.HasValue && !Intersections.Contains(intersection.Value))
+                    var intersection = this._orthogonalPathFinder.FindIntersection(conn, conn2);
+                    if (intersection.HasValue && !this.Intersections.Contains(intersection.Value))
                     {
-                        Intersections.Add(intersection.Value);
+                        this.Intersections.Add(intersection.Value);
                     }
                 }
             }
 
-            pathFinder.ConstructGraph(Intersections.ToList().OrderBy(x => x.X).ThenBy(y => y.Y).ToList());
+            this._orthogonalPathFinder.ConstructGraph(this.Intersections.ToList().OrderBy(x => x.X).ThenBy(y => y.Y).ToList());
             sw.Stop();
-            Console.WriteLine(sw.ElapsedMilliseconds);
+            Console.WriteLine($"Algorithm time: {sw.ElapsedMilliseconds} ms");
         }
     }
 }

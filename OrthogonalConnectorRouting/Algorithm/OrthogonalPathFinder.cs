@@ -8,13 +8,13 @@ using System.Windows;
 
 namespace OrthogonalConnectorRouting
 {
-    public class OrthogonalPathFinder
+    public class OrthogonalPathFinder : IOrthogonalPathFinder
     {
         private List<Connection> _connections;
         private Graph<Point, Point> _graph;
 
-        public double Margin { get; set; } = 10;
-
+        public double Margin { get; set; } = 0;
+    
         public OrthogonalPathFinder()
         {
             this._connections = new List<Connection>();
@@ -30,7 +30,7 @@ namespace OrthogonalConnectorRouting
                 var edges = new List<Connection>();
 
                 // Find edges
-                foreach(var connection in this._connections)
+                foreach (var connection in this._connections)
                 {
                     if (this.IsInsideLine(connection, intersection.X, intersection.Y))
                     {
@@ -50,7 +50,7 @@ namespace OrthogonalConnectorRouting
                 {
                     foreach (var point in intersections)
                     {
-                        if (this.IsInsideLine(edge,point.X,point.Y) && intersection != point)
+                        if (this.IsInsideLine(edge, point.X, point.Y) && intersection != point)
                         {
                             possibleNeighbors.Add(point);
                         }
@@ -85,7 +85,7 @@ namespace OrthogonalConnectorRouting
                         bottom = neighbor;
                     }
                 }
-                
+
                 // Add vertices and edges to the graph
                 this._graph.AddVertex(intersection, intersection);
                 var vertices = new Point?[] { left, right, top, bottom };
@@ -96,7 +96,7 @@ namespace OrthogonalConnectorRouting
                         this._graph.AddVertex(vertex.Value, vertex.Value);
                         this._graph.AddEdge(intersection, vertex.Value);
                     }
-                } 
+                }
             }
         }
 
@@ -129,39 +129,27 @@ namespace OrthogonalConnectorRouting
             return null;
         }
 
-        private bool IsInsideLine(Connection line, double x, double y)
-        {
-            return (x >= line.Start.X && x <= line.End.X || x >= line.End.X && x <= line.Start.X)
-                   && (y >= line.Start.Y && y <= line.End.Y || y >= line.End.Y && y <= line.Start.Y);
-        }
-
         public List<Connection> CreateLeadLines(List<DesignerItem> items, double maxWidth, double maxHeight)
         {
-            // maxWidth -= Margin;
-            // maxHeight -= Margin;
+            maxWidth -= this.Margin;
+            maxHeight -= this.Margin;
             this._connections = new List<Connection>();
             var xAxisItems = new Dictionary<(double Y, double Bottom), (double X, double Right)>();
             var yAxisItems = new Dictionary<(double X, double Right), (double Y, double Bottom)>();
 
-            // Create Horizontal Dictionary
+            // Create Horizontal & Vertical dictionaries
             foreach (var item in items)
             {
-                var yRange = (item.Y, item.Bottom);
-                var xRange = (item.X, item.Right);
+                var yRange = (item.Y - this.Margin, item.Bottom + this.Margin);
+                var xRange = (item.X - this.Margin, item.Right + this.Margin);
                 if (!xAxisItems.ContainsKey(yRange))
                 {
-                    xAxisItems.Add(
-                        (item.Y, item.Bottom),
-                        (item.X, item.Right)
-                    );
+                    xAxisItems.Add(yRange, xRange);
                 }
 
                 if (!yAxisItems.ContainsKey(xRange))
                 {
-                    yAxisItems.Add(
-                        (item.X, item.Right),
-                        (item.Y, item.Bottom)
-                    );
+                    yAxisItems.Add(xRange, yRange);
                 }
             }
 
@@ -172,145 +160,266 @@ namespace OrthogonalConnectorRouting
 
                 var leftCollisions = new List<(double Y, double Bottom)>();
                 var rightCollisions = new List<(double Y, double Bottom)>();
+                var verticalMiddleCollisions = new List<(double Y, double Bottom)>();
+
+                var median = this.CalcMedian(item.X, item.Right);
                 foreach (var range in yAxisItems.Keys)
                 {
-                    if (item.X == range.X && item.Right == range.Right)
+                    if ((item.X - this.Margin) == range.X && (item.Right + this.Margin) == range.Right)
                     {
                         continue;
                     }
 
-                    if (item.X >= range.X && item.X <= range.Right)
+                    if ((item.X - this.Margin) >= range.X && (item.X - this.Margin) <= range.Right)
                     {
                         leftCollisions.Add(yAxisItems[range]);
                     }
 
-                    if (item.Right >= range.X && item.Right <= range.Right)
+                    if ((item.Right + this.Margin) >= range.X && (item.Right + this.Margin) <= range.Right)
                     {
                         rightCollisions.Add(yAxisItems[range]);
                     }
+
+                    if (median >= range.X && median <= range.Right)
+                    {
+                        verticalMiddleCollisions.Add(yAxisItems[range]);
+                    }
                 }
 
-                this.VerticalCollisionDetection(leftCollisions, item.Y, item.X, maxHeight);
-                this.VerticalCollisionDetection(rightCollisions, item.Y, item.Right, maxHeight);
+                var data = new CollisionData
+                {
+                    StartPoint = item.Y - this.Margin,
+                    StartX = item.X - this.Margin,
+                    StartY = this.Margin, // Zero position
+                    EndX = item.X - this.Margin,
+                    EndY = maxHeight,
+                    Maximum = maxHeight,
+                    IsVertical = true
+                };
+
+                this.CollisionDetection(leftCollisions, data);
+
+                data.StartX = data.EndX = item.Right + this.Margin;
+                this.CollisionDetection(rightCollisions, data);
+
+                data = new CollisionData
+                {
+                    StartPoint = item.Y - this.Margin,
+                    StartX = this.CalcMedian(item.X, item.Right),
+                    StartY = this.Margin, // Zero position
+                    EndX = this.CalcMedian(item.X, item.Right),
+                    EndY = item.Y - this.Margin,
+                    OppositeSide = item.Bottom + this.Margin,
+                    Maximum = maxHeight,
+                    IsVertical = true
+                };
+                
+                this.ConnectorPointsCollisionDetection(verticalMiddleCollisions, data);
                 #endregion
 
                 #region Horizontal Lines
 
                 var topCollisions = new List<(double X, double Right)>();
                 var bottomCollisions = new List<(double X, double Right)>();
+                var horizontalMiddleCollisions = new List<(double X, double Right)>();
+
+                median = this.CalcMedian(item.Y, item.Bottom);
                 foreach (var range in xAxisItems.Keys)
                 {
-                    if (item.Y == range.Y && item.Bottom == range.Bottom)
+                    if ((item.Y - this.Margin) == range.Y && (item.Bottom + this.Margin) == range.Bottom)
                     {
                         continue;
                     }
 
-                    if (item.Y >= range.Y && item.Y <= range.Bottom)
+                    if ((item.Y - this.Margin) >= range.Y && (item.Y - this.Margin) <= range.Bottom)
                     {
                         topCollisions.Add(xAxisItems[range]);
                     }
 
-                    if (item.Bottom >= range.Y && item.Bottom <= range.Bottom)
+                    if ((item.Bottom + this.Margin) >= range.Y && (item.Bottom + this.Margin) <= range.Bottom)
                     {
                         bottomCollisions.Add(xAxisItems[range]);
                     }
+
+                    if (median >= range.Y && median <= range.Bottom)
+                    {
+                        horizontalMiddleCollisions.Add(xAxisItems[range]);
+                    }
                 }
 
-                this.HorizontalCollisionDetection(topCollisions, item.X, item.Y, maxWidth);
-                this.HorizontalCollisionDetection(bottomCollisions, item.X, item.Bottom, maxWidth);
+                data = new CollisionData
+                {
+                    StartPoint = item.X - this.Margin,
+                    StartX = this.Margin, // Zero position
+                    StartY = item.Y - this.Margin,
+                    EndX = maxWidth,
+                    EndY = item.Y - this.Margin,
+                    Maximum = maxWidth,
+                    IsVertical = false
+                };
+
+                this.CollisionDetection(topCollisions, data);
+                
+                data.StartY = data.EndY = item.Bottom + this.Margin;
+                this.CollisionDetection(bottomCollisions, data);
+
+                data = new CollisionData
+                {
+                    StartPoint = item.X - this.Margin,
+                    StartX = this.Margin, // Zero position
+                    StartY = this.CalcMedian(item.Y, item.Bottom),
+                    EndX = item.X - this.Margin,
+                    EndY = this.CalcMedian(item.Y, item.Bottom),
+                    OppositeSide = item.Right + this.Margin,
+                    Maximum = maxWidth,
+                    IsVertical = false
+                };
+                
+                this.ConnectorPointsCollisionDetection(horizontalMiddleCollisions, data);
                 #endregion
             }
 
             return this._connections;
         }
 
-        private void VerticalCollisionDetection(List<(double Y, double Bottom)> detectedCollisions, double Y, double flowXCoord, double maxHeight)
+        private void CollisionDetection(List<(double A, double B)> detectedCollisions, CollisionData data)
         {
-            // Single collision
             if (detectedCollisions.Count == 1)
             {
-                // Top collision
-                if (detectedCollisions[0].Bottom < Y)
-                {
-                    this.AddConnection(flowXCoord, detectedCollisions[0].Bottom, flowXCoord, maxHeight);
-                }
-                else
-                {
-                    // Bottom collision
-                    this.AddConnection(flowXCoord, 0, flowXCoord, detectedCollisions[0].Y);
-                }
+                this.SingleCollision(detectedCollisions, data);
             }
             else if (detectedCollisions.Count > 1)
             {
-                // Multiple collisions
-                double minimum = 0;
-                double maximum = maxHeight;
-                foreach (var collision in detectedCollisions)
-                {
-                    if (collision.Bottom < Y && collision.Bottom > minimum)
-                    {
-                        minimum = collision.Bottom;
-                    }
-                    else if (collision.Y > Y && collision.Y < maximum)
-                    {
-                        maximum = collision.Y;
-                    }
-                }
-
-                this.AddConnection(flowXCoord, minimum, flowXCoord, maximum);
+                this.MultipleCollisions(detectedCollisions, data);
             }
             else
             {
                 // No collision
-                this.AddConnection(flowXCoord, 0, flowXCoord, maxHeight);
+                this.AddConnection(data.StartX, data.StartY, data.EndX, data.EndY);
             }
         }
 
-        private void HorizontalCollisionDetection(List<(double X, double Right)> detectedCollisions, double X, double flowYCoord, double maxWidth)
+        private void ConnectorPointsCollisionDetection(List<(double A, double B)> detectedCollisions, CollisionData data)
         {
-            // Single collision
-            if (detectedCollisions.Count == 1)
+            if (detectedCollisions.Count == 0)
             {
-                // Left collision
-                if (detectedCollisions[0].Right < X)
+                this.AddConnection(data.StartX, data.StartY, data.EndX, data.EndY);
+                if (data.IsVertical)
                 {
-                    this.AddConnection(detectedCollisions[0].Right, flowYCoord, maxWidth, flowYCoord);
+                    this.AddConnection(data.StartX, data.OppositeSide, data.EndX, data.Maximum);
                 }
                 else
                 {
-                    // Right collision
-                    this.AddConnection(0, flowYCoord, detectedCollisions[0].X, flowYCoord);
+                    this.AddConnection(data.OppositeSide, data.StartY, data.Maximum, data.EndY);
                 }
             }
-            else if (detectedCollisions.Count > 1)
+            else if (detectedCollisions.Count > 0)
             {
-                // Multiple collisions
-                double minimum = 0;
-                double maximum = maxWidth;
-                foreach (var collision in detectedCollisions)
+                this.FindMinMax(detectedCollisions, data, out double minimum, out double maximum);
+                if (data.IsVertical)
                 {
-                    if (collision.Right < X && collision.Right > minimum)
-                    {
-                        minimum = collision.Right;
-                    }
-                    else if (collision.X > X && collision.X < maximum)
-                    {
-                        maximum = collision.X;
-                    }
+                    this.AddConnection(data.StartX, minimum, data.EndX, data.EndY);
+                    this.AddConnection(data.StartX, data.OppositeSide, data.EndX, maximum);
                 }
+                else
+                {
+                    this.AddConnection(minimum, data.StartY, data.EndX, data.EndY);
+                    this.AddConnection(data.OppositeSide, data.StartY, maximum, data.EndY);
+                }
+            }
+        }
 
-                this.AddConnection(minimum, flowYCoord, maximum, flowYCoord);
+        private void MultipleCollisions(List<(double A, double B)> detectedCollisions, CollisionData data)
+        {
+            this.FindMinMax(detectedCollisions, data, out double minimum, out double maximum);
+            if (data.IsVertical)
+            {
+                this.AddConnection(data.StartX, minimum, data.EndX, maximum);
             }
             else
             {
-                // No collision
-                this.AddConnection(0, flowYCoord, maxWidth, flowYCoord);
+                this.AddConnection(minimum, data.StartY, maximum, data.EndY);
+            }
+        }
+
+        private void FindMinMax(List<(double A, double B)> detectedCollisions, CollisionData data, out double minimum, out double maximum)
+        {
+            minimum = 0;
+            maximum = data.Maximum;
+            foreach (var collision in detectedCollisions)
+            {
+                if (collision.B < data.StartPoint && collision.B > minimum)
+                {
+                    minimum = collision.B;
+                }
+                else if (collision.A > data.StartPoint && collision.A < maximum)
+                {
+                    maximum = collision.A;
+                }
+            }
+        }
+
+        private void SingleCollision(List<(double A, double B)> detectedCollisions, CollisionData data)
+        {
+            // Left collision
+            if (detectedCollisions[0].B < data.StartPoint)
+            {
+                if (data.IsVertical)
+                {
+                    this.AddConnection(data.StartX, detectedCollisions[0].B, data.EndX, data.EndY);
+                }
+                else
+                {
+                    this.AddConnection(detectedCollisions[0].B, data.StartY, data.EndX, data.EndY);
+                }
+            }
+            else
+            {
+                // Right collision
+                if (data.IsVertical)
+                {
+                    this.AddConnection(data.StartX, data.StartY, data.EndX, detectedCollisions[0].A);
+                }
+                else
+                {
+                    this.AddConnection(data.StartX, data.StartY, detectedCollisions[0].A, data.EndY);
+                }
             }
         }
 
         private void AddConnection(double startX, double startY, double endX, double endY)
         {
             this._connections.Add(new Connection(new Point(startX, startY), new Point(endX, endY)));
+        }
+
+        private double CalcMedian(double a, double b)
+        {
+            return (a + b) / 2;
+        }
+
+        private bool IsInsideLine(Connection line, double x, double y)
+        {
+            return (x >= line.Start.X && x <= line.End.X || x >= line.End.X && x <= line.Start.X)
+                   && (y >= line.Start.Y && y <= line.End.Y || y >= line.End.Y && y <= line.Start.Y);
+        }
+
+        private class CollisionData
+        {
+            public double StartPoint { get; set; }
+
+            public double StartX { get; set; }
+
+            public double StartY { get; set; }
+
+            public double EndX { get; set; }
+
+            public double EndY { get; set; }
+
+            public double Maximum { get; set; }
+
+            public double OppositeSide { get; set; }
+
+            public bool IsVertical { get; set; }
         }
     }
 }

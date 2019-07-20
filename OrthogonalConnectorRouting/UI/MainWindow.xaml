@@ -10,9 +10,7 @@
         Height="450"
         Width="800">
     <Canvas>
-
-
-        <ItemsControl ItemsSource="{Binding AllItems}">
+        <ItemsControl ItemsSource="{Binding DesignerItems}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Canvas />
@@ -80,11 +78,5 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-
-        <!--<Polyline x:Name="PolylineConnetion"
-                  StrokeThickness="6"
-                  Stroke="Red"
-                  StrokeLineJoin="Round"
-                  Points="{Binding Path=ConnectionPoints, Converter={x:Static local:ConnectionPathConverter.Instance}}" />-->
     </Canvas>
 </Window>
