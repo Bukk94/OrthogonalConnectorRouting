@@ -1,85 +1,253 @@
-﻿using System;
+﻿using Priority_Queue;
+using System;
 using System.Collections.Generic;
-using System.Data.Linq;
 using System.Linq;
 
-namespace OrthogonalConnectorRouting
+namespace OrthogonalConnectorRouting.Graph
 {
-    public class Graph<TKey, T>
+    public class Graph<N, E, K> : IGraph<N, E, K> where N : INode<K>
+                                                  where E : IEdge<N, K>
+                                                  where K : IComparable
+
     {
+        protected IPriorityBST<GraphVertex, K> tree;
+
         public Graph()
         {
-            this.Vertices = new Dictionary<TKey, Vertex<T>>();
+            this.tree = new PriorityBST<GraphVertex, K>();
         }
 
-        public IDictionary<TKey, Vertex<T>> Vertices { get; }
+        public int NodesCount { get { return this.tree.Count; } }
 
-        public void AddVertex(TKey key, T value)
+        public void AddEdge(N firstNode, N secondNode, E edge)
         {
-            if (this.Vertices.ContainsKey(key))
+            var genericEdge = new GraphEdge()
             {
-                return;
-            }
+                Source = this.tree.Find(edge.Source.X, edge.Source.Y),
+                Destination = this.tree.Find(edge.Destination.X, edge.Destination.Y),
+                Weight = edge.Weight,
+                Data = edge
+            };
 
-            this.Vertices.Add(key, new Vertex<T>(value));
+            var first = this.tree.Find(firstNode.X, firstNode.Y);
+            first?.Edges.Add(genericEdge);
+
+            var second = this.tree.Find(secondNode.X, secondNode.Y);
+            second?.Edges.Add(genericEdge);
         }
 
-        public void AddEdge(TKey from, TKey to)
+        public void AddNode(N node)
         {
-            if (!(this.Vertices.ContainsKey(from) && this.Vertices.ContainsKey(to)))
+            var genericNode = new GraphVertex()
             {
-                throw new ArgumentNullException();
-            }
+                Key = node.Key,
+                X = node.X,
+                Y = node.Y,
+                Data = node
+            };
 
-            this.Vertices.TryGetValue(from, out var fromVertex);
-            this.Vertices.TryGetValue(to, out var toVertex);
-
-            var edge = new Edge<T>(fromVertex, toVertex);
-            fromVertex?.Edges.Add(edge);
-            toVertex?.Edges.Add(edge);
+            this.tree.Insert(genericNode);
         }
 
-        public void DeleteEdge(TKey from, TKey to)
+        public void AddNodes(IEnumerable<N> collection)
         {
-            this.Vertices.TryGetValue(from, out var fromVertex);
-            this.Vertices.TryGetValue(to, out var toVertex);
-
-            var edge = fromVertex?.Edges.FirstOrDefault(x => x.From == fromVertex && x.To == toVertex);
-            fromVertex?.Edges.Remove(edge);
-            toVertex?.Edges.Remove(edge);
-        }
-
-        public void DeleteVertex(TKey key)
-        {
-            if (!this.Vertices.ContainsKey(key))
+            foreach (var node in collection)
             {
-                throw new ArgumentNullException();
-            }
-
-            this.Vertices.TryGetValue(key, out var vertexToDel);
-
-            foreach (var edge in vertexToDel.Edges)
-            {
-                var from = edge.From;
-                var to = edge.To;
-
-                if (!vertexToDel.Equals(from))
+                var genericNode = new GraphVertex()
                 {
-                    from.Edges.Remove(from.Edges.FirstOrDefault(x => x.Equals(edge)));
-                }
+                    Key = node.Key,
+                    X = node.X,
+                    Y = node.Y,
+                    Data = node
+                };
 
-                if (!vertexToDel.Equals(to))
-                {
-                    to.Edges.Remove(to.Edges.FirstOrDefault(x => x.Equals(edge)));
-                }
+                this.tree.Insert(genericNode);
             }
-
-            this.Vertices.Remove(key);
         }
 
         public void Clear()
         {
-            this.Vertices.Clear();
+            this.tree.Clear();
         }
+
+        public void PrintTree()
+        {
+            this.tree.PrintTree();
+        }
+
+        public N Find(K key)
+        {
+            var result = this.tree.Find(key);
+            return result != default(GraphVertex) ? result.Data : default(N);
+        }
+
+        public N Find(double x, double y)
+        {
+            var result = this.tree.Find(x, y);
+            return result != default(GraphVertex) ? result.Data : default(N);
+        }
+
+        public List<E> FindEdges(N node)
+        {
+            List<E> edges = new List<E>();
+
+            var treeNode = this.tree.Find(node.X, node.Y);
+            if (treeNode == null)
+            {
+                return edges;
+            }
+
+            foreach (var n in this.tree.Nodes)
+            {
+                foreach (var e in n.Edges)
+                {
+                    if (e.Source.Key.Equals(node.Key) || e.Destination.Key.Equals(node.Key))
+                    {
+                        edges.Add(e.Data);
+                    }
+                }
+            }
+
+            return edges;
+        }
+
+        public List<N> IntervalFind(double x1, double y1, double x2, double y2)
+        {
+            var result = this.tree.IntervalFind(x1, y1, x2, y2);
+            List<N> interval = new List<N>();
+
+            foreach (var item in result)
+            {
+                interval.Add(item.Data);
+            }
+
+            return interval;
+        }
+
+        public void RemoveEdge(E edge)
+        {
+            this.RemoveEdge(edge.Source, edge.Destination);
+        }
+
+        public void RemoveEdge(N firstNode, N secondNode)
+        {
+            var first = this.tree.Find(firstNode.X, firstNode.Y);
+            var second = this.tree.Find(secondNode.X, secondNode.Y);
+
+            if (first == null || second == null)
+            {
+                return;
+            }
+
+            var edge = first.Edges.Except(second.Edges).FirstOrDefault();
+            first.Edges.Remove(edge);
+            second.Edges.Remove(edge);
+        }
+
+        public void RemoveNode(N node)
+        {
+            this.tree.Remove(this.tree.Find(node.X, node.Y));
+        }
+
+        public (List<N> pathNodes, List<E> pathEdges) ShortestPath(N startNode, N finishNode)
+        {
+            Dictionary<GraphVertex, double> totalCosts = new Dictionary<GraphVertex, double>();
+            Dictionary<GraphVertex, GraphVertex> prevNodes = new Dictionary<GraphVertex, GraphVertex>();
+            SimplePriorityQueue<GraphVertex> minPQ = new SimplePriorityQueue<GraphVertex>();
+            List<GraphVertex> visited = new List<GraphVertex>();
+            Dictionary<GraphVertex, GraphEdge> paths = new Dictionary<GraphVertex, GraphEdge>();
+
+            var treeStartNode = this.tree.Find(startNode.X, startNode.Y);
+            totalCosts.Add(treeStartNode, 0);
+            minPQ.Enqueue(treeStartNode, 0);
+
+            foreach (var node in this.tree.Nodes)
+            {
+                if (!node.Key.Equals(startNode.Key))
+                {
+                    totalCosts.Add(node, double.MaxValue);
+                    minPQ.Enqueue(node, float.MaxValue);
+                }
+            }
+
+            while (minPQ.Count > 0)
+            {
+                GraphVertex newSmallest = minPQ.Dequeue();
+                visited.Add(newSmallest);
+
+                foreach (var edge in newSmallest.Edges)
+                {
+                    var possiblyUnvisitedNode = edge.Source == newSmallest ? edge.Destination : edge.Source;
+
+                    if (!visited.Contains(possiblyUnvisitedNode))
+                    {
+                        var altPath = totalCosts[newSmallest] + edge.Weight;
+
+                        if (totalCosts.ContainsKey(possiblyUnvisitedNode) && altPath < totalCosts[possiblyUnvisitedNode])
+                        {
+                            totalCosts[possiblyUnvisitedNode] = altPath;
+                            prevNodes[possiblyUnvisitedNode] = newSmallest;
+                            paths[possiblyUnvisitedNode] = edge;
+
+                            minPQ.UpdatePriority(possiblyUnvisitedNode, (float)altPath);
+                        }
+                    }
+                }
+            }
+
+            List<E> edges = new List<E>();
+            var last = this.tree.Find(finishNode.X, finishNode.Y);
+            var shortestPath = new List<N>();
+
+            while (prevNodes.ContainsKey(last))
+            {
+                edges.Add(paths[last].Data);
+                shortestPath.Add(last.Data);
+                last = prevNodes[last];
+            }
+
+            shortestPath.Add(startNode);
+            shortestPath.Reverse();
+
+            return (shortestPath, edges);
+        }
+
+        #region Private classes
+        protected class GraphVertex : INode<K>
+        {
+            public K Key { get; set; }
+
+            public double X { get; set; }
+
+            public double Y { get; set; }
+
+            public N Data { get; set; }
+
+            public List<GraphEdge> Edges { get; set; }
+
+            public GraphVertex()
+            {
+                this.Edges = new List<GraphEdge>();
+            }
+
+            public override string ToString()
+            {
+                return Data.ToString();
+            }
+        }
+
+        protected class GraphEdge : IEdge<GraphVertex, K>
+        {
+            public K Key { get { return Data.Key; } }
+
+            public E Data { get; set; }
+
+            public GraphVertex Source { get; set; }
+
+            public GraphVertex Destination { get; set; }
+
+            public double Weight { get; set; }
+        }
+        #endregion
     }
 }

@@ -10,74 +10,125 @@
         WindowStartupLocation="CenterScreen"
         Height="450"
         Width="800">
-    <Canvas>
-        <ItemsControl ItemsSource="{Binding DesignerItems}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Canvas />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemContainerStyle>
-                <Style TargetType="ContentPresenter">
-                    <Setter Property="Canvas.Left"
-                            Value="{Binding X}" />
-                    <Setter Property="Canvas.Top"
-                            Value="{Binding Y}" />
-                </Style>
-            </ItemsControl.ItemContainerStyle>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Rectangle Width="{Binding Width}"
-                               Height="{Binding Height}"
-                               Fill="DarkGray" />
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="7*"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
 
-        <ItemsControl ItemsSource="{Binding Connections}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Canvas />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
+        <StackPanel Grid.Column="1">
+            <TextBlock Text="{Binding RunTime, StringFormat={}Algorithm calc. time: {0} ms}"
+                       Margin="0 20 0 0"
+                       Grid.Row="0"
+                       Height="30"
+                       Grid.Column="1" />
+        </StackPanel>
 
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Polyline x:Name="PolylineConnetion"
-                              StrokeThickness="3"
-                              Stroke="Red"
-                              StrokeLineJoin="Round"
-                              Points="{Binding Path=Points, Converter={x:Static local:ConnectionPathConverter.Instance}}" />
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <TextBlock Name="MousePositionTxt"
+                   Grid.Row="1"
+                   VerticalAlignment="Bottom"
+                   HorizontalAlignment="Right"
+                   Margin="0 0 10 10"
+                   Text="{}{ 0:0 }"
+                   Grid.Column="1"/>
+        
+        <Canvas MouseMove="Canvas_MouseMove"
+                Name="Canvas"
+                Grid.RowSpan="2"
+                Grid.ColumnSpan="2">
 
-        <ItemsControl ItemsSource="{Binding Intersections}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Canvas />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemContainerStyle>
-                <Style TargetType="ContentPresenter">
-                    <Setter Property="Canvas.Left"
-                            Value="{Binding X}" />
-                    <Setter Property="Canvas.Top"
-                            Value="{Binding Y}" />
-                </Style>
-            </ItemsControl.ItemContainerStyle>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Ellipse Width="10"
-                             Height="10"
-                             Fill="Blue">
-                        <Ellipse.RenderTransform>
-                            <TranslateTransform X="-5"
-                                                Y="-5" />
-                        </Ellipse.RenderTransform>
-                    </Ellipse>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </Canvas>
+            <!--Designer/Box items-->
+            <ItemsControl ItemsSource="{Binding DesignerItems}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Left"
+                                Value="{Binding X}" />
+                        <Setter Property="Canvas.Top"
+                                Value="{Binding Y}" />
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Rectangle Width="{Binding Width}"
+                                   Height="{Binding Height}"
+                                   Fill="DarkGray" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!--Connections/Edges-->
+            <ItemsControl ItemsSource="{Binding Connections}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Polyline x:Name="PolylineConnetion"
+                                  StrokeThickness="1"
+                                  Stroke="Red"
+                                  StrokeLineJoin="Round"
+                                  Points="{Binding Path=Points, Converter={x:Static local:ConnectionPathConverter.Instance}}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!--Optimal path-->
+            <ItemsControl ItemsSource="{Binding Paths}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Polyline x:Name="PolylineConnetion"
+                                  StrokeThickness="5"
+                                  Stroke="Black"
+                                  StrokeLineJoin="Round"
+                                  Points="{Binding Path=Points, Converter={x:Static local:ConnectionPathConverter.Instance}}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!--Intersections-->
+            <ItemsControl ItemsSource="{Binding Intersections}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Left"
+                                Value="{Binding X}" />
+                        <Setter Property="Canvas.Top"
+                                Value="{Binding Y}" />
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Ellipse Width="8"
+                                 Height="8"
+                                 Fill="Blue">
+                            <Ellipse.RenderTransform>
+                                <TranslateTransform X="-4"
+                                                    Y="-4" />
+                            </Ellipse.RenderTransform>
+                        </Ellipse>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Canvas>
+    </Grid>
 </Window>

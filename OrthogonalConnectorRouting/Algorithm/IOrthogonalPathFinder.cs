@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using OrthogonalConnectorRouting.Graph;
+using System;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace OrthogonalConnectorRouting
@@ -12,5 +14,7 @@ namespace OrthogonalConnectorRouting
         Point? FindIntersection(Connection lineA, Connection lineB);
 
         void ConstructGraph(List<Point> intersections);
+
+        (List<Node> pathNodes, List<Edge> pathEdges) ShortestPath(Node startNode, Node finishNode);
     }
 }

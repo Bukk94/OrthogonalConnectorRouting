@@ -7,7 +7,7 @@ using System.Windows;
 
 namespace OrthogonalConnectorRouting
 {
-    public class DesignerItem
+    public class DesignerItem 
     {
         public double X { get; set; }
 

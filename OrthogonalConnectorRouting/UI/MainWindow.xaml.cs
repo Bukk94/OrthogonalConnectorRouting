@@ -25,5 +25,11 @@ namespace OrthogonalConnectorRouting
             InitializeComponent();
             this.DataContext = new ConnectorVM();
         }
+
+        private void Canvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            var position = Mouse.GetPosition(Canvas);
+            this.MousePositionTxt.Text = $"{{ {position.X} : {position.Y} }}";
+        }
     }
 }

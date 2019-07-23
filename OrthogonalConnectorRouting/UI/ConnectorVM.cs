@@ -1,6 +1,8 @@
-﻿using System;
+﻿using OrthogonalConnectorRouting.Graph;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -9,9 +11,12 @@ using System.Windows;
 
 namespace OrthogonalConnectorRouting
 {
-    public class ConnectorVM
+    public class ConnectorVM : INotifyPropertyChanged
     {
+        private double _algorithmTime = 0;
         private IOrthogonalPathFinder _orthogonalPathFinder;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public ObservableCollection<DesignerItem> DesignerItems { get; private set; }
 
@@ -19,11 +24,24 @@ namespace OrthogonalConnectorRouting
 
         public ObservableCollection<Point> Intersections { get; private set; }
 
+        public ObservableCollection<Connection> Paths { get; private set; }
+
+        public double RunTime
+        {
+            get { return this._algorithmTime; }
+            set
+            {
+                this._algorithmTime = value;
+                this.NotifyPropertyChanged("RunTime");
+            }
+        }
+
         public ConnectorVM()
         {
             this.DesignerItems = new ObservableCollection<DesignerItem>();
             this.Connections = new ObservableCollection<Connection>();
             this.Intersections = new ObservableCollection<Point>();
+            this.Paths = new ObservableCollection<Connection>();
 
             // Add testing blocks
             this.DesignerItems.Add(new DesignerItem { X = 50, Y = 150, Height = 50, Width = 130 });
@@ -42,7 +60,7 @@ namespace OrthogonalConnectorRouting
                 foreach (var conn2 in this.Connections)
                 {
                     if (conn == conn2)
-                    { 
+                    {
                         continue;
                     }
 
@@ -54,9 +72,25 @@ namespace OrthogonalConnectorRouting
                 }
             }
 
+            // TESTING PHASE
             this._orthogonalPathFinder.ConstructGraph(this.Intersections.ToList().OrderBy(x => x.X).ThenBy(y => y.Y).ToList());
+            var shortestPath = this._orthogonalPathFinder.ShortestPath(new Node(50, 175),
+                                                                       new Node(550, 295));
+
+
+            foreach (var t in shortestPath.pathEdges)
+            {
+                this.Paths.Add(new Connection(t.Source.Position, t.Destination.Position));
+            }
+
             sw.Stop();
             Console.WriteLine($"Algorithm time: {sw.ElapsedMilliseconds} ms");
+            this.RunTime = sw.ElapsedMilliseconds;
+        }
+
+        private void NotifyPropertyChanged(String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

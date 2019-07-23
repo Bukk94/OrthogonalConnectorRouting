@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OrthogonalConnectorRouting.Graph;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -11,14 +12,14 @@ namespace OrthogonalConnectorRouting
     public class OrthogonalPathFinder : IOrthogonalPathFinder
     {
         private List<Connection> _connections;
-        private Graph<Point, Point> _graph;
+        private IGraph<Node, Edge, string> _graph;
 
         public double Margin { get; set; } = 0;
     
         public OrthogonalPathFinder()
         {
             this._connections = new List<Connection>();
-            this._graph = new Graph<Point, Point>();
+            this._graph = new Graph<Node, Edge, string>();
         }
 
         public void ConstructGraph(List<Point> intersections)
@@ -58,45 +59,67 @@ namespace OrthogonalConnectorRouting
                 }
 
                 // Find neareast neighbors
-                Point? left = null;
-                Point? right = null;
-                Point? top = null;
-                Point? bottom = null;
+                Point? left, right, top, bottom;
+                left = right = top = bottom = null;
                 foreach (var neighbor in possibleNeighbors)
                 {
-                    // Left
                     if (neighbor.X < intersection.X && neighbor.Y == intersection.Y && (!left.HasValue || left.Value.X < neighbor.X))
                     {
                         left = neighbor;
                     }
                     else if (neighbor.X > intersection.X && neighbor.Y == intersection.Y && (!right.HasValue || right.Value.X > neighbor.X))
                     {
-                        // Right
                         right = neighbor;
                     }
                     else if (neighbor.Y < intersection.Y && neighbor.X == intersection.X && (!top.HasValue || top.Value.Y < neighbor.Y))
                     {
-                        // Top
                         top = neighbor;
                     }
                     else if (neighbor.Y > intersection.Y && neighbor.X == intersection.X && (!bottom.HasValue || bottom.Value.Y > neighbor.Y))
                     {
-                        // Bottom
                         bottom = neighbor;
                     }
                 }
 
                 // Add vertices and edges to the graph
-                this._graph.AddVertex(intersection, intersection);
+                this.AddNode(intersection);
                 var vertices = new Point?[] { left, right, top, bottom };
                 foreach (var vertex in vertices)
                 {
                     if (vertex.HasValue)
                     {
-                        this._graph.AddVertex(vertex.Value, vertex.Value);
-                        this._graph.AddEdge(intersection, vertex.Value);
+                        this.AddNode(vertex.Value);
+                        this.AddEdge(intersection, vertex.Value);
                     }
                 }
+            }
+        }
+
+        public (List<Node> pathNodes, List<Edge> pathEdges) ShortestPath(Node startNode, Node finishNode)
+        {
+            return this._graph.ShortestPath(startNode, finishNode);
+        }
+
+        private void AddEdge(Point sourcePoint, Point destinationPoint)
+        {
+            var source = this._graph.Find(sourcePoint.X, sourcePoint.Y);
+            var dest = this._graph.Find(destinationPoint.X, destinationPoint.Y);
+            Edge edge = new Edge
+            {
+                Source = source,
+                Destination = dest,
+                Weight = Distance(new Point(sourcePoint.X, sourcePoint.Y), new Point(destinationPoint.X, destinationPoint.Y))
+            };
+
+            this._graph.AddEdge(source, dest, edge);
+        }
+
+        public void AddNode(Point data)
+        {
+            Node node = new Node(data.X, data.Y);
+            if (this._graph.Find(data.X, data.Y) == null)
+            {
+                this._graph.AddNode(node);
             }
         }
 
@@ -401,6 +424,11 @@ namespace OrthogonalConnectorRouting
         {
             return (x >= line.Start.X && x <= line.End.X || x >= line.End.X && x <= line.Start.X)
                    && (y >= line.Start.Y && y <= line.End.Y || y >= line.End.Y && y <= line.Start.Y);
+        }
+
+        private double Distance(Point source, Point target)
+        {
+            return Math.Pow(target.X - source.X, 2) + Math.Pow(target.Y - source.Y, 2);
         }
 
         private class CollisionData

@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Priority Queue, Version=4.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\OptimizedPriorityQueue.4.2.0\lib\net45\Priority Queue.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
@@ -65,13 +68,19 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Graph\Edge.cs" />
+    <Compile Include="Graph\Graph.cs" />
+    <Compile Include="Graph\IEdge.cs" />
+    <Compile Include="Graph\IGraph.cs" />
+    <Compile Include="Graph\INode.cs" />
+    <Compile Include="Graph\BST\IPriorityBST.cs" />
+    <Compile Include="Graph\BST\MethodExtensions.cs" />
+    <Compile Include="Graph\Node.cs" />
+    <Compile Include="Graph\BST\PriorityBST.cs" />
     <Compile Include="Models\Connection.cs" />
     <Compile Include="UI\ConnectionPathConverter.cs" />
     <Compile Include="Models\ConnectorInfo.cs" />
     <Compile Include="UI\ConnectorVM.cs" />
     <Compile Include="Models\DesignerItem.cs" />
-    <Compile Include="Graph\Graph.cs" />
-    <Compile Include="Graph\Vertex.cs" />
     <Compile Include="UI\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -97,6 +106,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="Algorithm\Orthogonal_connector_routing.pdf" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -104,6 +114,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="_TODOs_.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
