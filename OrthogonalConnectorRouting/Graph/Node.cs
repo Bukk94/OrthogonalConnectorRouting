@@ -25,10 +25,10 @@ namespace OrthogonalConnectorRouting.Graph
 
         public override bool Equals(Object obj)
         {
-            if (!(obj is DesignerItem))
+            if (!(obj is Node))
                 return base.Equals(obj);
 
-            return this.X.Equals(((DesignerItem)obj).X) && this.Y.Equals(((DesignerItem)obj).Y);
+            return this.X.Equals(((Node)obj).X) && this.Y.Equals(((Node)obj).Y);
         }
 
         public override int GetHashCode()
