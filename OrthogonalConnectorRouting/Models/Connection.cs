@@ -19,6 +19,5 @@ namespace OrthogonalConnectorRouting
         {
             Points = new List<Point>() { start, end };
         }
-
     }
 }

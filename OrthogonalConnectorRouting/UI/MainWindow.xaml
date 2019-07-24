@@ -10,22 +10,66 @@
         WindowStartupLocation="CenterScreen"
         Height="450"
         Width="800">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="boolToVis" />
+    </Window.Resources>
+    
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="4*" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="7*"/>
+            <RowDefinition Height="7*" />
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Column="1">
+        <StackPanel Grid.Column="1"
+                    Panel.ZIndex="50000"
+                    Margin="0 0 5 0">
             <TextBlock Text="{Binding RunTime, StringFormat={}Algorithm calc. time: {0} ms}"
                        Margin="0 20 0 0"
                        Grid.Row="0"
                        Height="30"
-                       Grid.Column="1" />
+                       Grid.Column="1" 
+                       Background="LightGray"/>
+            <Grid Background="LightGray">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="8*" />
+                </Grid.ColumnDefinitions>
+                
+                <CheckBox x:Name="leadLinesCheckbox"
+                          VerticalAlignment="Center"
+                          IsChecked="True"
+                          Margin="2">
+                    <TextBlock Text="Show lead lines"
+                               VerticalAlignment="Center" />
+                </CheckBox>
+
+                <CheckBox x:Name="intersectionsCheckbox"
+                          Grid.Row="1"
+                          IsChecked="True"
+                          VerticalAlignment="Center"
+                          Margin="2">
+                    <TextBlock Text="Show intersections"
+                               VerticalAlignment="Center" />
+                </CheckBox>
+
+                <CheckBox x:Name="optimalPathCheckbox"
+                          Grid.Row="2"
+                          IsChecked="True"
+                          VerticalAlignment="Center"
+                          Margin="2">
+                    <TextBlock Text="Show optimal path"
+                               VerticalAlignment="Center" />
+                </CheckBox>
+            </Grid>
         </StackPanel>
 
         <TextBlock Name="MousePositionTxt"
@@ -34,10 +78,11 @@
                    HorizontalAlignment="Right"
                    Margin="0 0 10 10"
                    Text="{}{ 0:0 }"
-                   Grid.Column="1"/>
-        
+                   Grid.Column="1" />
+
         <Canvas MouseMove="Canvas_MouseMove"
                 Name="Canvas"
+                Panel.ZIndex="1"
                 Grid.RowSpan="2"
                 Grid.ColumnSpan="2">
 
@@ -66,7 +111,10 @@
             </ItemsControl>
 
             <!--Connections/Edges-->
-            <ItemsControl ItemsSource="{Binding Connections}">
+            <ItemsControl ItemsSource="{Binding Connections}"
+                          Visibility="{Binding IsChecked,
+                                         ElementName=leadLinesCheckbox,
+                                         Converter={StaticResource boolToVis}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Canvas />
@@ -84,7 +132,10 @@
             </ItemsControl>
 
             <!--Optimal path-->
-            <ItemsControl ItemsSource="{Binding Paths}">
+            <ItemsControl ItemsSource="{Binding Paths}"
+                          Visibility="{Binding IsChecked,
+                                         ElementName=optimalPathCheckbox,
+                                         Converter={StaticResource boolToVis}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Canvas />
@@ -102,7 +153,10 @@
             </ItemsControl>
 
             <!--Intersections-->
-            <ItemsControl ItemsSource="{Binding Intersections}">
+            <ItemsControl ItemsSource="{Binding Intersections}"
+                          Visibility="{Binding IsChecked,
+                                         ElementName=intersectionsCheckbox,
+                                         Converter={StaticResource boolToVis}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Canvas />

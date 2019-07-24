@@ -3,4 +3,3 @@
 1) Implement A*
 2) Implement own priority queue
 3) Make better connector input/output
-4) Create option to enable/disable certain UI elements (connectors, intersections, optimal path, etc)
