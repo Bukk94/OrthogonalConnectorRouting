@@ -8,7 +8,7 @@ namespace OrthogonalConnectorRouting.PriorityQueue
         private const int DefaultCapacity = 20;
         private IComparer<P> _comparer;
         private HeapNode[] _heap;
-        private Dictionary<D, HeapNode>_cache;
+        private Dictionary<D, HeapNode> _cache;
         private long _nodeIDCounter = 0;
 
         public bool IsEmpty => this.Count == 0;
