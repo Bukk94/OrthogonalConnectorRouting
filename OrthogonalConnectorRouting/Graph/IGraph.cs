@@ -23,8 +23,6 @@ namespace OrthogonalConnectorRouting.Graph
 
         void Clear();
 
-        void PrintTree();
-
         N Find(double x, double y);
 
         N Find(K key);

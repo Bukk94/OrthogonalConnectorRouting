@@ -72,15 +72,14 @@ namespace OrthogonalConnectorRouting
                 }
             }
 
-            // TESTING PHASE
             this._orthogonalPathFinder.ConstructGraph(this.Intersections.ToList().OrderBy(x => x.X).ThenBy(y => y.Y).ToList());
             var shortestPath = this._orthogonalPathFinder.ShortestPath(new Node(50, 175),
                                                                        new Node(550, 295));
 
 
-            foreach (var t in shortestPath.pathEdges)
+            foreach (var pathEdge in shortestPath.pathEdges)
             {
-                this.Paths.Add(new Connection(t.Source.Position, t.Destination.Position));
+                this.Paths.Add(new Connection(pathEdge.Source.Position, pathEdge.Destination.Position));
             }
 
             sw.Stop();
@@ -90,7 +89,7 @@ namespace OrthogonalConnectorRouting
 
         private void NotifyPropertyChanged(String propertyName = "")
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

@@ -422,8 +422,8 @@ namespace OrthogonalConnectorRouting
 
         private bool IsInsideLine(Connection line, double x, double y)
         {
-            return (x >= line.Start.X && x <= line.End.X || x >= line.End.X && x <= line.Start.X)
-                   && (y >= line.Start.Y && y <= line.End.Y || y >= line.End.Y && y <= line.Start.Y);
+            return (x >= line.Start.X && x <= line.End.X || x >= line.End.X && x <= line.Start.X) &&
+                   (y >= line.Start.Y && y <= line.End.Y || y >= line.End.Y && y <= line.Start.Y);
         }
 
         private double Distance(Point source, Point target)

@@ -34,8 +34,6 @@ namespace OrthogonalConnectorRouting.Graph
 
         void BuildTree(IEnumerable<N> nodes);
 
-        void PrintTree();
-
         void Clear();
 
         List<N> ToList();

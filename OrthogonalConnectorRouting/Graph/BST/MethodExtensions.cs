@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace OrthogonalConnectorRouting.Graph
 {
@@ -12,7 +7,9 @@ namespace OrthogonalConnectorRouting.Graph
         public static IEnumerable<T> ToEnumerable<T>(this IEnumerator<T> enumerator)
         {
             while (enumerator.MoveNext())
+            {
                 yield return enumerator.Current;
+            }
         }
     }
 }

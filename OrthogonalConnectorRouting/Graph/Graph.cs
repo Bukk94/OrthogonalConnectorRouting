@@ -8,7 +8,6 @@ namespace OrthogonalConnectorRouting.Graph
     public class Graph<N, E, K> : IGraph<N, E, K> where N : INode<K>
                                                   where E : IEdge<N, K>
                                                   where K : IComparable
-
     {
         protected IPriorityBST<GraphVertex, K> tree;
 
@@ -17,11 +16,11 @@ namespace OrthogonalConnectorRouting.Graph
             this.tree = new PriorityBST<GraphVertex, K>();
         }
 
-        public int NodesCount { get { return this.tree.Count; } }
+        public int NodesCount => this.tree.Count;
 
         public void AddEdge(N firstNode, N secondNode, E edge)
         {
-            var genericEdge = new GraphEdge()
+            var genericEdge = new GraphEdge
             {
                 Source = this.tree.Find(edge.Source.X, edge.Source.Y),
                 Destination = this.tree.Find(edge.Destination.X, edge.Destination.Y),
@@ -38,7 +37,7 @@ namespace OrthogonalConnectorRouting.Graph
 
         public void AddNode(N node)
         {
-            var genericNode = new GraphVertex()
+            var genericNode = new GraphVertex
             {
                 Key = node.Key,
                 X = node.X,
@@ -53,7 +52,7 @@ namespace OrthogonalConnectorRouting.Graph
         {
             foreach (var node in collection)
             {
-                var genericNode = new GraphVertex()
+                var genericNode = new GraphVertex
                 {
                     Key = node.Key,
                     X = node.X,
@@ -70,11 +69,6 @@ namespace OrthogonalConnectorRouting.Graph
             this.tree.Clear();
         }
 
-        public void PrintTree()
-        {
-            this.tree.PrintTree();
-        }
-
         public N Find(K key)
         {
             var result = this.tree.Find(key);
@@ -89,7 +83,7 @@ namespace OrthogonalConnectorRouting.Graph
 
         public List<E> FindEdges(N node)
         {
-            List<E> edges = new List<E>();
+            var edges = new List<E>();
 
             var treeNode = this.tree.Find(node.X, node.Y);
             if (treeNode == null)
@@ -114,7 +108,7 @@ namespace OrthogonalConnectorRouting.Graph
         public List<N> IntervalFind(double x1, double y1, double x2, double y2)
         {
             var result = this.tree.IntervalFind(x1, y1, x2, y2);
-            List<N> interval = new List<N>();
+            var interval = new List<N>();
 
             foreach (var item in result)
             {
@@ -195,7 +189,7 @@ namespace OrthogonalConnectorRouting.Graph
                 }
             }
 
-            List<E> edges = new List<E>();
+            var edges = new List<E>();
             var last = this.tree.Find(finishNode.X, finishNode.Y);
             var shortestPath = new List<N>();
 
@@ -232,13 +226,13 @@ namespace OrthogonalConnectorRouting.Graph
 
             public override string ToString()
             {
-                return Data.ToString();
+                return this.Data.ToString();
             }
         }
 
         protected class GraphEdge : IEdge<GraphVertex, K>
         {
-            public K Key { get { return Data.Key; } }
+            public K Key => this.Data.Key;
 
             public E Data { get; set; }
 
