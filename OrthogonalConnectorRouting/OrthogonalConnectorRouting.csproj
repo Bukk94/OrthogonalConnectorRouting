@@ -34,9 +34,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Priority Queue, Version=4.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OptimizedPriorityQueue.4.2.0\lib\net45\Priority Queue.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
@@ -76,6 +73,8 @@
     <Compile Include="Graph\BST\MethodExtensions.cs" />
     <Compile Include="Graph\Node.cs" />
     <Compile Include="Graph\BST\PriorityBST.cs" />
+    <Compile Include="Graph\PriorityQueue\IPriorityQueue.cs" />
+    <Compile Include="Graph\PriorityQueue\PriorityQueue.cs" />
     <Compile Include="Models\Connection.cs" />
     <Compile Include="UI\ConnectionPathConverter.cs" />
     <Compile Include="Models\ConnectorInfo.cs" />
@@ -106,7 +105,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="Algorithm\Orthogonal_connector_routing.pdf" />
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

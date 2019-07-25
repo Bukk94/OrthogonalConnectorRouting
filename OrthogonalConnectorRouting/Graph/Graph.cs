@@ -1,4 +1,5 @@
-﻿using Priority_Queue;
+﻿using OrthogonalConnectorRouting.PriorityQueue;
+using Priority_Queue;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -151,11 +152,11 @@ namespace OrthogonalConnectorRouting.Graph
 
         public (List<N> pathNodes, List<E> pathEdges) ShortestPath(N startNode, N finishNode)
         {
-            Dictionary<GraphVertex, double> totalCosts = new Dictionary<GraphVertex, double>();
-            Dictionary<GraphVertex, GraphVertex> prevNodes = new Dictionary<GraphVertex, GraphVertex>();
-            SimplePriorityQueue<GraphVertex> minPQ = new SimplePriorityQueue<GraphVertex>();
-            List<GraphVertex> visited = new List<GraphVertex>();
-            Dictionary<GraphVertex, GraphEdge> paths = new Dictionary<GraphVertex, GraphEdge>();
+            IPriorityQueue<GraphVertex, double> minPQ = new PriorityQueue<GraphVertex, double>();
+            var totalCosts = new Dictionary<GraphVertex, double>();
+            var prevNodes = new Dictionary<GraphVertex, GraphVertex>();
+            var visited = new List<GraphVertex>();
+            var paths = new Dictionary<GraphVertex, GraphEdge>();
 
             var treeStartNode = this.tree.Find(startNode.X, startNode.Y);
             totalCosts.Add(treeStartNode, 0);
@@ -166,13 +167,13 @@ namespace OrthogonalConnectorRouting.Graph
                 if (!node.Key.Equals(startNode.Key))
                 {
                     totalCosts.Add(node, double.MaxValue);
-                    minPQ.Enqueue(node, float.MaxValue);
+                    minPQ.Enqueue(node, double.MaxValue);
                 }
             }
 
             while (minPQ.Count > 0)
             {
-                GraphVertex newSmallest = minPQ.Dequeue();
+                var newSmallest = minPQ.Dequeue();
                 visited.Add(newSmallest);
 
                 foreach (var edge in newSmallest.Edges)
@@ -189,7 +190,7 @@ namespace OrthogonalConnectorRouting.Graph
                             prevNodes[possiblyUnvisitedNode] = newSmallest;
                             paths[possiblyUnvisitedNode] = edge;
 
-                            minPQ.UpdatePriority(possiblyUnvisitedNode, (float)altPath);
+                            minPQ.UpdatePriority(possiblyUnvisitedNode, altPath);
                         }
                     }
                 }

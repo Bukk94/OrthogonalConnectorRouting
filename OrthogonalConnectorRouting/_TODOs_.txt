@@ -1,5 +1,5 @@
 ﻿// TODO in this project
 
 1) Implement A*
-2) Implement own priority queue
+2) Implement ISearchAlg interface and generalize search engine in Graph class
 3) Make better connector input/output
