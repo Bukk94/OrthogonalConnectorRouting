@@ -81,6 +81,7 @@ namespace OrthogonalConnectorRouting.PriorityQueue
             lastNode.PositionInQueue = 1;
             this._heap[this.Count] = null;
             this.Count--;
+            this._cache.Remove(maxPrio.Data);
 
             this.HeapifyDown(lastNode);
 
@@ -89,6 +90,11 @@ namespace OrthogonalConnectorRouting.PriorityQueue
 
         public void UpdatePriority(D inputNode, P newPriority)
         {
+            if (inputNode == null || newPriority == null)
+            {
+                throw new NullReferenceException("Input node or priority is null");
+            }
+
             var node = this._cache[inputNode];
             node.Priority = newPriority;
 

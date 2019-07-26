@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrthogonalConnectorRouting", "OrthogonalConnectorRouting\OrthogonalConnectorRouting.csproj", "{27F9545B-07F9-474D-992E-050DEE55AF18}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrthogonalConnectorRoutingTests", "OrthogonalConnectorRoutingTests\OrthogonalConnectorRoutingTests.csproj", "{B9357FA6-6C70-4996-AC39-23A47C78E13E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{27F9545B-07F9-474D-992E-050DEE55AF18}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27F9545B-07F9-474D-992E-050DEE55AF18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27F9545B-07F9-474D-992E-050DEE55AF18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9357FA6-6C70-4996-AC39-23A47C78E13E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9357FA6-6C70-4996-AC39-23A47C78E13E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9357FA6-6C70-4996-AC39-23A47C78E13E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9357FA6-6C70-4996-AC39-23A47C78E13E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
