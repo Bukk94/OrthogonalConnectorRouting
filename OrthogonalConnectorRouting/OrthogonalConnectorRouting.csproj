@@ -76,8 +76,10 @@
     <Compile Include="Graph\PriorityQueue\IPriorityQueue.cs" />
     <Compile Include="Graph\PriorityQueue\PriorityQueue.cs" />
     <Compile Include="Models\Connection.cs" />
+    <Compile Include="Models\LogicModels\Connector.cs" />
+    <Compile Include="Models\LogicModels\ConnectorOrientation.cs" />
+    <Compile Include="UI\Base\RelayParamCommand.cs" />
     <Compile Include="UI\ConnectionPathConverter.cs" />
-    <Compile Include="Models\ConnectorInfo.cs" />
     <Compile Include="UI\ConnectorVM.cs" />
     <Compile Include="Models\DesignerItem.cs" />
     <Compile Include="UI\MainWindow.xaml.cs">

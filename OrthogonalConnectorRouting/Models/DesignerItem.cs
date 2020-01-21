@@ -1,4 +1,6 @@
-﻿namespace OrthogonalConnectorRouting
+﻿using OrthogonalConnectorRouting.Graph;
+
+namespace OrthogonalConnectorRouting
 {
     public class DesignerItem 
     {

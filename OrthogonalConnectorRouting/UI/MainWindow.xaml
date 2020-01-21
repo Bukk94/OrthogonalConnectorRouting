@@ -13,7 +13,7 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="boolToVis" />
     </Window.Resources>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4*" />
@@ -31,8 +31,8 @@
                        Margin="0 20 0 0"
                        Grid.Row="0"
                        Height="30"
-                       Grid.Column="1" 
-                       Background="LightGray"/>
+                       Grid.Column="1"
+                       Background="LightGray" />
             <Grid Background="LightGray">
                 <Grid.RowDefinitions>
                     <RowDefinition />
@@ -43,7 +43,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="8*" />
                 </Grid.ColumnDefinitions>
-                
+
                 <CheckBox x:Name="leadLinesCheckbox"
                           VerticalAlignment="Center"
                           IsChecked="True"
@@ -103,9 +103,17 @@
                 </ItemsControl.ItemContainerStyle>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Rectangle Width="{Binding Width}"
-                                   Height="{Binding Height}"
-                                   Fill="DarkGray" />
+                        <ContentControl>
+                            <Rectangle Width="{Binding Width}"
+                                       Height="{Binding Height}"
+                                       Fill="DarkGray">
+                                <Rectangle.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{Binding DataContext.AddConnectorCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                  CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Rectangle}}" />
+                                </Rectangle.InputBindings>
+                            </Rectangle>
+                        </ContentControl>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
