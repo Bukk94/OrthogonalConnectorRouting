@@ -1,8 +1,8 @@
-﻿using OrthogonalConnectorRouting.Graph;
+﻿using OrthogonalConnectorRouting.Models;
 
-namespace OrthogonalConnectorRouting
+namespace OrthogonalConnectorRouting_SampleApp
 {
-    public class DesignerItem 
+    public class DesignerItem : IInput
     {
         public double X { get; set; }
 

@@ -12,9 +12,9 @@ namespace OrthogonalConnectorRouting.Models
 
         public List<Connection> ConnectorPath { get; set; }
 
-        public DesignerItem Source { get; set; }
+        public IInput Source { get; set; }
 
-        public DesignerItem Destinaton { get; set; }
+        public IInput Destinaton { get; set; }
 
         public ConnectorOrientation SourceOrientation { get; set; }
 
@@ -24,7 +24,7 @@ namespace OrthogonalConnectorRouting.Models
 
         public Node DestinatonNode => this.CalculateOrientationNode(this.DestinationOrientation, this.Destinaton);
 
-        private Node CalculateOrientationNode(ConnectorOrientation orientation, DesignerItem item)
+        private Node CalculateOrientationNode(ConnectorOrientation orientation, IInput item)
         {
             switch (orientation)
             {

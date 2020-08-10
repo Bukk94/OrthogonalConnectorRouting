@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OrthogonalConnectorRoutingTests</RootNamespace>
     <AssemblyName>OrthogonalConnectorRoutingTests</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -64,7 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OrthogonalConnectorRouting\OrthogonalConnectorRouting.csproj">
-      <Project>{27F9545B-07F9-474D-992E-050DEE55AF18}</Project>
+      <Project>{3db76311-c5c6-43eb-b7ee-9140e05750bb}</Project>
       <Name>OrthogonalConnectorRouting</Name>
     </ProjectReference>
   </ItemGroup>

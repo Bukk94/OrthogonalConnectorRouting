@@ -1,19 +1,17 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OrthogonalConnectorRouting.Graph;
 using OrthogonalConnectorRouting.PriorityQueue;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OrthogonalConnectorRouting
+namespace OrthogonalConnectorRoutingTests
 {
     [TestClass()]
     public class PriorityQueueTests
     {
-        IPriorityQueue<int, double> _priorityQueue;
+        private IPriorityQueue<int, double> _priorityQueue;
+
         public PriorityQueueTests()
         {
             this._priorityQueue = new PriorityQueue<int, double>();

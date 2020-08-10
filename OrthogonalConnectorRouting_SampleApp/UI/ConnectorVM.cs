@@ -1,4 +1,4 @@
-﻿using OrthogonalConnectorRouting.Graph;
+﻿using OrthogonalConnectorRouting;
 using OrthogonalConnectorRouting.Models;
 using System;
 using System.Collections.Generic;
@@ -6,12 +6,10 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
-namespace OrthogonalConnectorRouting
+namespace OrthogonalConnectorRouting_SampleApp
 {
     public class ConnectorVM : INotifyPropertyChanged
     {
@@ -21,7 +19,7 @@ namespace OrthogonalConnectorRouting
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ObservableCollection<DesignerItem> DesignerItems { get; private set; }
+        public ObservableCollection<IInput> DesignerItems { get; private set; }
 
         public ObservableCollection<Connection> Connections { get; private set; }
 
@@ -43,7 +41,7 @@ namespace OrthogonalConnectorRouting
 
         public ConnectorVM()
         {
-            this.DesignerItems = new ObservableCollection<DesignerItem>();
+            this.DesignerItems = new ObservableCollection<IInput>();
             this.Connections = new ObservableCollection<Connection>();
             this.Intersections = new ObservableCollection<Point>();
             this.Paths = new ObservableCollection<Connection>();
@@ -138,14 +136,14 @@ namespace OrthogonalConnectorRouting
             {
                 _lastConnector = new Connector
                 {
-                    Source = rect.DataContext as DesignerItem
+                    Source = rect.DataContext as IInput
                 };
 
                 _lastConnector.SourceOrientation = this.CalculateOrientation(_lastConnector.Source, relativeCoords);
             }
             else
             {
-                _lastConnector.Destinaton = rect.DataContext as DesignerItem;
+                _lastConnector.Destinaton = rect.DataContext as IInput;
                 _lastConnector.DestinationOrientation = this.CalculateOrientation(_lastConnector.Destinaton, relativeCoords);
                 this.CalculatePathForConnector(_lastConnector);
                 this.DrawPath(_lastConnector);
@@ -153,7 +151,7 @@ namespace OrthogonalConnectorRouting
             }
         }
 
-        private ConnectorOrientation CalculateOrientation(DesignerItem item, Point relativeCoords)
+        private ConnectorOrientation CalculateOrientation(IInput item, Point relativeCoords)
         {
             var coords = new List<Point>
             {

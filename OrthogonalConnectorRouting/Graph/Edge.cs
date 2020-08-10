@@ -1,6 +1,6 @@
 ﻿namespace OrthogonalConnectorRouting.Graph
 {
-    public class Edge : IEdge<Node, string> // Edge<N, T> : IEdge<N, T> where N : INode<T>
+    public class Edge : IEdge<Node, string>
     {
         public string Key { get; private set; }
 

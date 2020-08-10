@@ -1,10 +1,7 @@
 ﻿using OrthogonalConnectorRouting.Graph;
+using OrthogonalConnectorRouting.Models;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace OrthogonalConnectorRouting
@@ -152,7 +149,7 @@ namespace OrthogonalConnectorRouting
             return null;
         }
 
-        public List<Connection> CreateLeadLines(List<DesignerItem> items, double maxWidth, double maxHeight)
+        public List<Connection> CreateLeadLines(List<IInput> items, double maxWidth, double maxHeight)
         {
             maxWidth -= this.Margin;
             maxHeight -= this.Margin;

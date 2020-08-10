@@ -1,5 +1,5 @@
 ﻿using OrthogonalConnectorRouting.Graph;
-using System;
+using OrthogonalConnectorRouting.Models;
 using System.Collections.Generic;
 using System.Windows;
 
@@ -9,7 +9,7 @@ namespace OrthogonalConnectorRouting
     {
         double Margin { get; set; }
 
-        List<Connection> CreateLeadLines(List<DesignerItem> items, double maxWidth, double maxHeight);
+        List<Connection> CreateLeadLines(List<IInput> items, double maxWidth, double maxHeight);
 
         Point? FindIntersection(Connection lineA, Connection lineB);
 
