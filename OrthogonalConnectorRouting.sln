@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrthogonalConnectorRouting_SampleApp", "OrthogonalConnectorRouting_SampleApp\OrthogonalConnectorRouting_SampleApp.csproj", "{27F9545B-07F9-474D-992E-050DEE55AF18}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "SampleApp\SampleApp.csproj", "{27F9545B-07F9-474D-992E-050DEE55AF18}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrthogonalConnectorRoutingTests", "OrthogonalConnectorRoutingTests\OrthogonalConnectorRoutingTests.csproj", "{B9357FA6-6C70-4996-AC39-23A47C78E13E}"
 EndProject

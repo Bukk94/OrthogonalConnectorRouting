@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace OrthogonalConnectorRouting_SampleApp
+namespace SampleApp
 {
     [ValueConversion(typeof(List<Point>), typeof(PointCollection))]
     public class ConnectionPathConverter : IValueConverter

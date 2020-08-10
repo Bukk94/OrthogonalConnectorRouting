@@ -1,6 +1,6 @@
 ﻿using OrthogonalConnectorRouting.Models;
 
-namespace OrthogonalConnectorRouting_SampleApp
+namespace SampleApp
 {
     public class DesignerItem : IInput
     {

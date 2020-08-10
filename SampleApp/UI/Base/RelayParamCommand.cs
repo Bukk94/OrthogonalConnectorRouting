@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace OrthogonalConnectorRouting_SampleApp
+namespace SampleApp
 {
     public class RelayParamCommand : ICommand
     {

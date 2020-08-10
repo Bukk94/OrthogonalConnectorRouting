@@ -9,7 +9,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
-namespace OrthogonalConnectorRouting_SampleApp
+namespace SampleApp
 {
     public class ConnectorVM : INotifyPropertyChanged
     {
