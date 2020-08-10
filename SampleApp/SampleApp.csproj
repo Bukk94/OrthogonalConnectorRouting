@@ -96,9 +96,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="_TODOs_.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\OrthogonalConnectorRouting\OrthogonalConnectorRouting.csproj">
       <Project>{3db76311-c5c6-43eb-b7ee-9140e05750bb}</Project>
       <Name>OrthogonalConnectorRouting</Name>

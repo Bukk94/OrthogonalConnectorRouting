@@ -60,5 +60,8 @@
   <ItemGroup>
     <None Include="Algorithm\Orthogonal_connector_routing.pdf" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="_TODOs_.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
