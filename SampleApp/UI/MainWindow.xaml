@@ -80,6 +80,17 @@
                    Text="{}{ 0:0 }"
                    Grid.Column="1" />
 
+        <TextBlock Grid.Row="1"
+                   Grid.Column="0"
+                   VerticalAlignment="Bottom"
+                   HorizontalAlignment="Left"
+                   Margin="10 0 0 10"
+                   TextWrapping="Wrap"
+                   FontSize="10"
+                   Foreground="Gray"
+                   MaxWidth="250"
+                   Text="Click with mouse left button onto two sides of different gray block to create new connection."/>
+
         <Canvas MouseMove="Canvas_MouseMove"
                 Name="Canvas"
                 Panel.ZIndex="1"

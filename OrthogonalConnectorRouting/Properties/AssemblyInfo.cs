@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("OrthogonalConnectorRouting")]
+[assembly: AssemblyTitle("Orthogonal Connector Routing Library")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("OrthogonalConnectorRouting")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyProduct("Orthogonal Connector Routing Library")]
+[assembly: AssemblyCopyright("Copyright © 2020 Martin Fryml")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

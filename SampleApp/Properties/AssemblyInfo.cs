@@ -7,12 +7,12 @@ using System.Windows;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("OrthogonalPathFinder_Dev")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Orthogonal Connector Routing Sample App")]
+[assembly: AssemblyDescription("Sample app presenting Orthogonal Connector Routing functionality")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("OrthogonalPathFinder_Dev")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyProduct("Orthogonal Connector Routing Sample App")]
+[assembly: AssemblyCopyright("Copyright © 2020 Martin Fryml")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
