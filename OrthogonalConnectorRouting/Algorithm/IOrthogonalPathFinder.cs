@@ -9,12 +9,18 @@ namespace OrthogonalConnectorRouting
     {
         double Margin { get; set; }
 
-        List<Connection> CreateLeadLines(List<IInput> items, double maxWidth, double maxHeight);
+        AlgResults OrthogonalPath(IEnumerable<IInput> items, double maxWidth, double maxHeight, Connector targetConnector);
+
+        #region Algorithm steps
+        IEnumerable<Connection> CreateLeadLines(IEnumerable<IInput> items, double maxWidth, double maxHeight);
 
         Point? FindIntersection(Connection lineA, Connection lineB);
 
-        void ConstructGraph(List<Point> intersections);
+        void ConstructGraph(IEnumerable<Point> intersections);
 
-        (List<Node> pathNodes, List<Edge> pathEdges) ShortestPath(Node startNode, Node finishNode);
+        ShortestGraphPath ShortestPath(Node startNode, Node finishNode);
+
+        ShortestGraphPath CalculatePathForConnector(Connector targetConnector);
+        #endregion
     }
 }

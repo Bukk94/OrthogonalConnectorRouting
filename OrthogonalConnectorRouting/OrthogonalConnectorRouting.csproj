@@ -51,10 +51,12 @@
     <Compile Include="Graph\Node.cs" />
     <Compile Include="Graph\PriorityQueue\IPriorityQueue.cs" />
     <Compile Include="Graph\PriorityQueue\PriorityQueue.cs" />
+    <Compile Include="Models\AlgResults.cs" />
     <Compile Include="Models\Connection.cs" />
     <Compile Include="Models\IInput.cs" />
     <Compile Include="Models\LogicModels\Connector.cs" />
     <Compile Include="Models\LogicModels\ConnectorOrientation.cs" />
+    <Compile Include="Models\ShortestPath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

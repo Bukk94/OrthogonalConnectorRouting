@@ -46,9 +46,16 @@ namespace SampleApp
             this.Intersections = new ObservableCollection<Point>();
             this.Paths = new ObservableCollection<Connection>();
 
+            this._orthogonalPathFinder = new OrthogonalPathFinder();
+
             // Register Commands
             this.AddConnectorCommand = new RelayParamCommand((param) => this.AddConnector(param));
 
+            this.RunSample();
+        }
+
+        private void RunSample()
+        {
             // Add testing blocks
             this.DesignerItems.Add(new DesignerItem { X = 50, Y = 150, Height = 50, Width = 130 });
             this.DesignerItems.Add(new DesignerItem { X = 400, Y = 130, Height = 50, Width = 130 });
@@ -56,14 +63,8 @@ namespace SampleApp
             this.DesignerItems.Add(new DesignerItem { X = 420, Y = 270, Height = 50, Width = 130 });
             this.DesignerItems.Add(new DesignerItem { X = 270, Y = 110, Height = 150, Width = 50 });
 
-            this._orthogonalPathFinder = new OrthogonalPathFinder();
             Stopwatch sw = new Stopwatch();
             sw.Start();
-
-            this.CalculateAndDrawLeadingLines();
-            this.CalculateAndDrawIntersections();
-
-            this._orthogonalPathFinder.ConstructGraph(this.Intersections.ToList().OrderBy(x => x.X).ThenBy(y => y.Y).ToList());
 
             // Add test route
             var connector = new Connector()
@@ -74,7 +75,11 @@ namespace SampleApp
                 DestinationOrientation = ConnectorOrientation.Right
             };
 
-            this.CalculatePathForConnector(connector);
+            var results = this._orthogonalPathFinder.OrthogonalPath(DesignerItems.ToList(), 800, 450, connector);
+
+            this.Connections = new ObservableCollection<Connection>(results.Connections);
+            this.Intersections = new ObservableCollection<Point>(results.Intersections);
+
             this.DrawPath(connector);
 
             sw.Stop();
@@ -82,43 +87,7 @@ namespace SampleApp
             this.RunTime = sw.ElapsedMilliseconds;
         }
 
-        private void CalculatePathForConnector(Connector connector)
-        {
-            var (pathNodes, pathEdges) = this._orthogonalPathFinder.ShortestPath(connector.SourceNode, connector.DestinatonNode);
-
-            foreach (var pathEdge in pathEdges)
-            {
-                connector.ConnectorPath.Add(new Connection(pathEdge.Source.Position, pathEdge.Destination.Position));
-            }
-        }
-
         #region Draw methods
-        private void CalculateAndDrawLeadingLines()
-        {
-            this.Connections = new ObservableCollection<Connection>(this._orthogonalPathFinder.CreateLeadLines(
-                                                                                DesignerItems.ToList(), 800, 450));
-        }
-
-        private void CalculateAndDrawIntersections()
-        {
-            foreach (var conn in this.Connections)
-            {
-                foreach (var conn2 in this.Connections)
-                {
-                    if (conn == conn2)
-                    {
-                        continue;
-                    }
-
-                    var intersection = this._orthogonalPathFinder.FindIntersection(conn, conn2);
-                    if (intersection.HasValue && !this.Intersections.Contains(intersection.Value))
-                    {
-                        this.Intersections.Add(intersection.Value);
-                    }
-                }
-            }
-        }
-
         private void DrawPath(Connector connector)
         {
             foreach (var path in connector.ConnectorPath)
@@ -145,7 +114,7 @@ namespace SampleApp
             {
                 _lastConnector.Destinaton = rect.DataContext as IInput;
                 _lastConnector.DestinationOrientation = this.CalculateOrientation(_lastConnector.Destinaton, relativeCoords);
-                this.CalculatePathForConnector(_lastConnector);
+                this._orthogonalPathFinder.CalculatePathForConnector(_lastConnector);
                 this.DrawPath(_lastConnector);
                 _lastConnector = null;
             }

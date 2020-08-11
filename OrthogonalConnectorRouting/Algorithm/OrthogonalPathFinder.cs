@@ -2,6 +2,7 @@
 using OrthogonalConnectorRouting.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 
 namespace OrthogonalConnectorRouting
@@ -19,7 +20,7 @@ namespace OrthogonalConnectorRouting
             this._graph = new Graph<Node, Edge, string>();
         }
 
-        public void ConstructGraph(List<Point> intersections)
+        public void ConstructGraph(IEnumerable<Point> intersections)
         {
             this._graph.Clear();
 
@@ -92,9 +93,15 @@ namespace OrthogonalConnectorRouting
             }
         }
 
-        public (List<Node> pathNodes, List<Edge> pathEdges) ShortestPath(Node startNode, Node finishNode)
+        public ShortestGraphPath ShortestPath(Node startNode, Node finishNode)
         {
-            return this._graph.ShortestPath(startNode, finishNode);
+            var (pathNodes, pathEdges) = this._graph.ShortestPath(startNode, finishNode);
+
+            return new ShortestGraphPath
+            {
+                PathNodes = pathNodes,
+                PathEdges = pathEdges
+            };
         }
 
         private void AddEdge(Point sourcePoint, Point destinationPoint)
@@ -111,7 +118,7 @@ namespace OrthogonalConnectorRouting
             this._graph.AddEdge(source, dest, edge);
         }
 
-        public void AddNode(Point data)
+        private void AddNode(Point data)
         {
             Node node = new Node(data.X, data.Y);
             if (this._graph.Find(data.X, data.Y) == null)
@@ -149,7 +156,7 @@ namespace OrthogonalConnectorRouting
             return null;
         }
 
-        public List<Connection> CreateLeadLines(List<IInput> items, double maxWidth, double maxHeight)
+        public IEnumerable<Connection> CreateLeadLines(IEnumerable<IInput> items, double maxWidth, double maxHeight)
         {
             maxWidth -= this.Margin;
             maxHeight -= this.Margin;
@@ -300,6 +307,52 @@ namespace OrthogonalConnectorRouting
             }
 
             return this._connections;
+        }
+
+        public AlgResults OrthogonalPath(IEnumerable<IInput> items, double maxWidth, double maxHeight, Connector targetConnector)
+        {
+            var connections = this.CreateLeadLines(items, maxWidth, maxHeight);
+
+            var intersections = new List<Point>();
+            foreach (var conn in connections)
+            {
+                foreach (var conn2 in connections)
+                {
+                    if (conn == conn2)
+                    {
+                        continue;
+                    }
+
+                    var intersection = this.FindIntersection(conn, conn2);
+                    if (intersection.HasValue && !intersections.Contains(intersection.Value))
+                    {
+                        intersections.Add(intersection.Value);
+                    }
+                }
+            }
+
+            this.ConstructGraph(intersections.OrderBy(x => x.X).ThenBy(y => y.Y));
+
+            var shortestPath = this.CalculatePathForConnector(targetConnector);
+
+            return new AlgResults
+            {
+                Connections = connections,
+                Intersections = intersections,
+                ShortestPath = shortestPath
+            };
+        }
+
+        public ShortestGraphPath CalculatePathForConnector(Connector targetConnector)
+        {
+            var shortestPath = this.ShortestPath(targetConnector.SourceNode, targetConnector.DestinatonNode);
+
+            foreach (var pathEdge in shortestPath.PathEdges)
+            {
+                targetConnector.ConnectorPath.Add(new Connection(pathEdge.Source.Position, pathEdge.Destination.Position));
+            }
+
+            return shortestPath;
         }
 
         private void CollisionDetection(List<(double A, double B)> detectedCollisions, CollisionData data)

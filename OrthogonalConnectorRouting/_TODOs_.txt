@@ -3,3 +3,4 @@
 1) Implement A*
 2) Implement ISearchAlg interface and generalize search engine in Graph class
 3) Make better connector input/output
+4) Create own structure of Point
