@@ -107,9 +107,5 @@
       <Name>OrthogonalConnectorRouting</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="MonoLib\PresentationCore.dll" />
-    <Content Include="MonoLib\PresentationFramework.dll" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

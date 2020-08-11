@@ -1,2 +1,2 @@
 language: csharp
-solution: OrthogonalConnectorRouting.sln
+solution: OrthogonalConnectorRouting_mono.sln
