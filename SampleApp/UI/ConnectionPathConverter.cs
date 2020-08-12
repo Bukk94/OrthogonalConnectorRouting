@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
 namespace SampleApp
 {
-    [ValueConversion(typeof(List<Point>), typeof(PointCollection))]
+    [ValueConversion(typeof(List<OrthogonalConnectorRouting.Models.Point>), typeof(PointCollection))]
     public class ConnectionPathConverter : IValueConverter
     {
         static ConnectionPathConverter()
@@ -20,11 +19,11 @@ namespace SampleApp
         {
             var pointCollection = new PointCollection();
 
-            if (value is List<Point> points)
+            if (value is List<OrthogonalConnectorRouting.Models.Point> points)
             {
                 foreach (var point in points)
                 {
-                    pointCollection.Add(point);
+                    pointCollection.Add(new System.Windows.Point(point.X, point.Y));
                 }
             }
 

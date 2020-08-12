@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 
 namespace OrthogonalConnectorRouting.Graph
 {
@@ -11,7 +10,7 @@ namespace OrthogonalConnectorRouting.Graph
 
         public string Key => String.Format("N({0},{1})", this.X, this.Y);
 
-        public Point Position => new Point(this.X, this.Y);
+        public Models.Point Position => new Models.Point(this.X, this.Y);
 
         public Node(double x, double y)
         {

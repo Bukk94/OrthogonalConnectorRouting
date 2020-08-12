@@ -1,19 +1,18 @@
 ﻿using System.Collections.Generic;
-using System.Windows;
 
 namespace OrthogonalConnectorRouting
 {
     public class Connection
     {
-        public List<Point> Points { get; set; }
+        public List<Models.Point> Points { get; set; }
 
-        public Point Start => this.Points[0];
+        public Models.Point Start => this.Points[0];
 
-        public Point End => this.Points[1];
+        public Models.Point End => this.Points[1];
 
-        public Connection(Point start, Point end)
+        public Connection(Models.Point start, Models.Point end)
         {
-            Points = new List<Point>() { start, end };
+            Points = new List<Models.Point>() { start, end };
         }
     }
 }

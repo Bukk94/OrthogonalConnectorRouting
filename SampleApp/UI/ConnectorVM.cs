@@ -23,7 +23,7 @@ namespace SampleApp
 
         public ObservableCollection<Connection> Connections { get; private set; }
 
-        public ObservableCollection<Point> Intersections { get; private set; }
+        public ObservableCollection<OrthogonalConnectorRouting.Models.Point> Intersections { get; private set; }
 
         public ObservableCollection<Connection> Paths { get; private set; }
 
@@ -43,7 +43,7 @@ namespace SampleApp
         {
             this.DesignerItems = new ObservableCollection<IInput>();
             this.Connections = new ObservableCollection<Connection>();
-            this.Intersections = new ObservableCollection<Point>();
+            this.Intersections = new ObservableCollection<OrthogonalConnectorRouting.Models.Point>();
             this.Paths = new ObservableCollection<Connection>();
 
             this._orthogonalPathFinder = new OrthogonalPathFinder();
@@ -78,7 +78,7 @@ namespace SampleApp
             var results = this._orthogonalPathFinder.OrthogonalPath(DesignerItems.ToList(), 800, 450, connector);
 
             this.Connections = new ObservableCollection<Connection>(results.Connections);
-            this.Intersections = new ObservableCollection<Point>(results.Intersections);
+            this.Intersections = new ObservableCollection<OrthogonalConnectorRouting.Models.Point>(results.Intersections);
 
             this.DrawPath(connector);
 
@@ -87,7 +87,6 @@ namespace SampleApp
             this.RunTime = sw.ElapsedMilliseconds;
         }
 
-        #region Draw methods
         private void DrawPath(Connector connector)
         {
             foreach (var path in connector.ConnectorPath)
@@ -95,12 +94,13 @@ namespace SampleApp
                 this.Paths.Add(path);
             }
         }
-        #endregion
 
         private void AddConnector(object param)
         {
             var rect = (System.Windows.Shapes.Rectangle)param;
-            var relativeCoords = Mouse.GetPosition((IInputElement)param);
+            var mousePosition = Mouse.GetPosition((IInputElement)param);
+            var relativeCoords = new OrthogonalConnectorRouting.Models.Point(mousePosition.X, mousePosition.Y);
+
             if (_lastConnector == null)
             {
                 _lastConnector = new Connector
@@ -108,43 +108,16 @@ namespace SampleApp
                     Source = rect.DataContext as IInput
                 };
 
-                _lastConnector.SourceOrientation = this.CalculateOrientation(_lastConnector.Source, relativeCoords);
+                _lastConnector.SourceOrientation = this._orthogonalPathFinder.CalculateOrientation(_lastConnector.Source, relativeCoords);
             }
             else
             {
                 _lastConnector.Destinaton = rect.DataContext as IInput;
-                _lastConnector.DestinationOrientation = this.CalculateOrientation(_lastConnector.Destinaton, relativeCoords);
+                _lastConnector.DestinationOrientation = this._orthogonalPathFinder.CalculateOrientation(_lastConnector.Destinaton, relativeCoords);
                 this._orthogonalPathFinder.CalculatePathForConnector(_lastConnector);
                 this.DrawPath(_lastConnector);
                 _lastConnector = null;
             }
-        }
-
-        private ConnectorOrientation CalculateOrientation(IInput item, Point relativeCoords)
-        {
-            var coords = new List<Point>
-            {
-                new Point(0, item.Height / 2), // LEFT
-                new Point(item.Width / 2, 0),   // TOP
-                new Point(item.Width, item.Height / 2),  // RIGHT
-                new Point(item.Width / 2, item.Height) // BOTTOM
-            };
-
-            Point closestPoint = new Point();
-            double closestDistanceSquared = double.MaxValue;
-            foreach (var point in coords)
-            {
-                var distanceSquared = Math.Pow(point.X - relativeCoords.X, 2) + Math.Pow(point.Y - relativeCoords.Y, 2);
-
-                if (distanceSquared < closestDistanceSquared)
-                {
-                    closestDistanceSquared = distanceSquared;
-                    closestPoint = point;
-                }
-            }
-
-            var orientation = coords.IndexOf(closestPoint);
-            return (ConnectorOrientation)Enum.Parse(typeof(ConnectorOrientation), orientation.ToString());
         }
 
         private void NotifyPropertyChanged(String propertyName = "")
