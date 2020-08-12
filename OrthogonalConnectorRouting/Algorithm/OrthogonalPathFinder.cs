@@ -1,26 +1,29 @@
-﻿using OrthogonalConnectorRouting.Graph;
+﻿using OrthogonalConnectorRouting.Algorithm;
+using OrthogonalConnectorRouting.Graph;
 using OrthogonalConnectorRouting.Models;
+using OrthogonalConnectorRouting.Models.InternalModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 
 namespace OrthogonalConnectorRouting
 {
     public class OrthogonalPathFinder : IOrthogonalPathFinder
     {
+        private readonly IGraph<Node, Edge, string> _graph;
+        private readonly CollisionDetection _collisionDetection;
         private List<Connection> _connections;
-        private IGraph<Node, Edge, string> _graph;
 
         public double Margin { get; set; } = 0;
     
         public OrthogonalPathFinder()
         {
-            this._connections = new List<Connection>();
             this._graph = new Graph<Node, Edge, string>();
+            this._collisionDetection = new CollisionDetection();
+            this._connections = new List<Connection>();
         }
 
-        public void ConstructGraph(IEnumerable<Point> intersections)
+        public void ConstructGraph(IEnumerable<Models.Point> intersections)
         {
             this._graph.Clear();
 
@@ -44,7 +47,7 @@ namespace OrthogonalConnectorRouting
                 }
 
                 // Find possible neighbors
-                var possibleNeighbors = new List<Point>();
+                var possibleNeighbors = new List<Models.Point>();
                 foreach (var edge in edges)
                 {
                     foreach (var point in intersections)
@@ -57,23 +60,23 @@ namespace OrthogonalConnectorRouting
                 }
 
                 // Find neareast neighbors
-                Point? left, right, top, bottom;
+                Models.Point left, right, top, bottom;
                 left = right = top = bottom = null;
                 foreach (var neighbor in possibleNeighbors)
                 {
-                    if (neighbor.X < intersection.X && neighbor.Y == intersection.Y && (!left.HasValue || left.Value.X < neighbor.X))
+                    if (neighbor.X < intersection.X && neighbor.Y == intersection.Y && (left == null || left.X < neighbor.X))
                     {
                         left = neighbor;
                     }
-                    else if (neighbor.X > intersection.X && neighbor.Y == intersection.Y && (!right.HasValue || right.Value.X > neighbor.X))
+                    else if (neighbor.X > intersection.X && neighbor.Y == intersection.Y && (right == null || right.X > neighbor.X))
                     {
                         right = neighbor;
                     }
-                    else if (neighbor.Y < intersection.Y && neighbor.X == intersection.X && (!top.HasValue || top.Value.Y < neighbor.Y))
+                    else if (neighbor.Y < intersection.Y && neighbor.X == intersection.X && (top == null || top.Y < neighbor.Y))
                     {
                         top = neighbor;
                     }
-                    else if (neighbor.Y > intersection.Y && neighbor.X == intersection.X && (!bottom.HasValue || bottom.Value.Y > neighbor.Y))
+                    else if (neighbor.Y > intersection.Y && neighbor.X == intersection.X && (bottom == null || bottom.Y > neighbor.Y))
                     {
                         bottom = neighbor;
                     }
@@ -81,13 +84,13 @@ namespace OrthogonalConnectorRouting
 
                 // Add vertices and edges to the graph
                 this.AddNode(intersection);
-                var vertices = new Point?[] { left, right, top, bottom };
+                var vertices = new Models.Point[] { left, right, top, bottom };
                 foreach (var vertex in vertices)
                 {
-                    if (vertex.HasValue)
+                    if (vertex != null)
                     {
-                        this.AddNode(vertex.Value);
-                        this.AddEdge(intersection, vertex.Value);
+                        this.AddNode(vertex);
+                        this.AddEdge(intersection, vertex);
                     }
                 }
             }
@@ -104,7 +107,7 @@ namespace OrthogonalConnectorRouting
             };
         }
 
-        private void AddEdge(Point sourcePoint, Point destinationPoint)
+        private void AddEdge(Models.Point sourcePoint, Models.Point destinationPoint)
         {
             var source = this._graph.Find(sourcePoint.X, sourcePoint.Y);
             var dest = this._graph.Find(destinationPoint.X, destinationPoint.Y);
@@ -112,13 +115,13 @@ namespace OrthogonalConnectorRouting
             {
                 Source = source,
                 Destination = dest,
-                Weight = Distance(new Point(sourcePoint.X, sourcePoint.Y), new Point(destinationPoint.X, destinationPoint.Y))
+                Weight = Distance(new Models.Point(sourcePoint.X, sourcePoint.Y), new Models.Point(destinationPoint.X, destinationPoint.Y))
             };
 
             this._graph.AddEdge(source, dest, edge);
         }
 
-        private void AddNode(Point data)
+        private void AddNode(Models.Point data)
         {
             Node node = new Node(data.X, data.Y);
             if (this._graph.Find(data.X, data.Y) == null)
@@ -127,7 +130,7 @@ namespace OrthogonalConnectorRouting
             }
         }
 
-        public Point? FindIntersection(Connection lineA, Connection lineB)
+        public Models.Point FindIntersection(Connection lineA, Connection lineB)
         {
             double A1 = lineA.End.Y - lineA.Start.Y;
             double B1 = lineA.Start.X - lineA.End.X;
@@ -150,7 +153,7 @@ namespace OrthogonalConnectorRouting
             // so finally check if x, y is within both the line segments
             if (this.IsInsideLine(lineA, x, y) && this.IsInsideLine(lineB, x, y))
             {
-                return new Point(x, y);
+                return new Models.Point(x, y);
             }
 
             return null;
@@ -224,10 +227,12 @@ namespace OrthogonalConnectorRouting
                     IsVertical = true
                 };
 
-                this.CollisionDetection(leftCollisions, data);
+                var detectedLeftCollisions = this._collisionDetection.DetectCollision(leftCollisions, data);
+                this._connections.AddRange(detectedLeftCollisions);
 
                 data.StartX = data.EndX = item.Right + this.Margin;
-                this.CollisionDetection(rightCollisions, data);
+                var detectedRightCollisions = this._collisionDetection.DetectCollision(rightCollisions, data);
+                this._connections.AddRange(detectedRightCollisions);
 
                 data = new CollisionData
                 {
@@ -240,8 +245,10 @@ namespace OrthogonalConnectorRouting
                     Maximum = maxHeight,
                     IsVertical = true
                 };
-                
-                this.ConnectorPointsCollisionDetection(verticalMiddleCollisions, data);
+
+                var detectedVerticalCollisions = this._collisionDetection.ConnectorPointsCollisionDetection(verticalMiddleCollisions, data);
+                this._connections.AddRange(detectedVerticalCollisions);
+
                 #endregion
 
                 #region Horizontal Lines
@@ -285,10 +292,12 @@ namespace OrthogonalConnectorRouting
                     IsVertical = false
                 };
 
-                this.CollisionDetection(topCollisions, data);
-                
+                var detectedTopCollisions = this._collisionDetection.DetectCollision(topCollisions, data);
+                this._connections.AddRange(detectedTopCollisions);
+
                 data.StartY = data.EndY = item.Bottom + this.Margin;
-                this.CollisionDetection(bottomCollisions, data);
+                var detectedBottomCollisions = this._collisionDetection.DetectCollision(bottomCollisions, data);
+                this._connections.AddRange(detectedBottomCollisions);
 
                 data = new CollisionData
                 {
@@ -301,8 +310,9 @@ namespace OrthogonalConnectorRouting
                     Maximum = maxWidth,
                     IsVertical = false
                 };
-                
-                this.ConnectorPointsCollisionDetection(horizontalMiddleCollisions, data);
+
+                var detectedHorizontalCollisions = this._collisionDetection.ConnectorPointsCollisionDetection(horizontalMiddleCollisions, data);
+                this._connections.AddRange(detectedHorizontalCollisions);
                 #endregion
             }
 
@@ -313,7 +323,7 @@ namespace OrthogonalConnectorRouting
         {
             var connections = this.CreateLeadLines(items, maxWidth, maxHeight);
 
-            var intersections = new List<Point>();
+            var intersections = new List<Models.Point>();
             foreach (var conn in connections)
             {
                 foreach (var conn2 in connections)
@@ -324,9 +334,9 @@ namespace OrthogonalConnectorRouting
                     }
 
                     var intersection = this.FindIntersection(conn, conn2);
-                    if (intersection.HasValue && !intersections.Contains(intersection.Value))
+                    if (intersection != null && !intersections.Contains(intersection))
                     {
-                        intersections.Add(intersection.Value);
+                        intersections.Add(intersection);
                     }
                 }
             }
@@ -355,114 +365,31 @@ namespace OrthogonalConnectorRouting
             return shortestPath;
         }
 
-        private void CollisionDetection(List<(double A, double B)> detectedCollisions, CollisionData data)
+        public ConnectorOrientation CalculateOrientation(IInput item, Models.Point relativeCoords)
         {
-            if (detectedCollisions.Count == 1)
+            var coords = new List<Models.Point>
             {
-                this.SingleCollision(detectedCollisions, data);
-            }
-            else if (detectedCollisions.Count > 1)
-            {
-                this.MultipleCollisions(detectedCollisions, data);
-            }
-            else
-            {
-                // No collision
-                this.AddConnection(data.StartX, data.StartY, data.EndX, data.EndY);
-            }
-        }
+                new Models.Point(0, item.Height / 2), // LEFT
+                new Models.Point(item.Width / 2, 0),   // TOP
+                new Models.Point(item.Width, item.Height / 2),  // RIGHT
+                new Models.Point(item.Width / 2, item.Height) // BOTTOM
+            };
 
-        private void ConnectorPointsCollisionDetection(List<(double A, double B)> detectedCollisions, CollisionData data)
-        {
-            if (detectedCollisions.Count == 0)
+            var closestPoint = new Models.Point();
+            double closestDistanceSquared = double.MaxValue;
+            foreach (var point in coords)
             {
-                this.AddConnection(data.StartX, data.StartY, data.EndX, data.EndY);
-                if (data.IsVertical)
-                {
-                    this.AddConnection(data.StartX, data.OppositeSide, data.EndX, data.Maximum);
-                }
-                else
-                {
-                    this.AddConnection(data.OppositeSide, data.StartY, data.Maximum, data.EndY);
-                }
-            }
-            else if (detectedCollisions.Count > 0)
-            {
-                this.FindMinMax(detectedCollisions, data, out double minimum, out double maximum);
-                if (data.IsVertical)
-                {
-                    this.AddConnection(data.StartX, minimum, data.EndX, data.EndY);
-                    this.AddConnection(data.StartX, data.OppositeSide, data.EndX, maximum);
-                }
-                else
-                {
-                    this.AddConnection(minimum, data.StartY, data.EndX, data.EndY);
-                    this.AddConnection(data.OppositeSide, data.StartY, maximum, data.EndY);
-                }
-            }
-        }
+                var distanceSquared = Math.Pow(point.X - relativeCoords.X, 2) + Math.Pow(point.Y - relativeCoords.Y, 2);
 
-        private void MultipleCollisions(List<(double A, double B)> detectedCollisions, CollisionData data)
-        {
-            this.FindMinMax(detectedCollisions, data, out double minimum, out double maximum);
-            if (data.IsVertical)
-            {
-                this.AddConnection(data.StartX, minimum, data.EndX, maximum);
+                if (distanceSquared < closestDistanceSquared)
+                {
+                    closestDistanceSquared = distanceSquared;
+                    closestPoint = point;
+                }
             }
-            else
-            {
-                this.AddConnection(minimum, data.StartY, maximum, data.EndY);
-            }
-        }
 
-        private void FindMinMax(List<(double A, double B)> detectedCollisions, CollisionData data, out double minimum, out double maximum)
-        {
-            minimum = 0;
-            maximum = data.Maximum;
-            foreach (var collision in detectedCollisions)
-            {
-                if (collision.B < data.StartPoint && collision.B > minimum)
-                {
-                    minimum = collision.B;
-                }
-                else if (collision.A > data.StartPoint && collision.A < maximum)
-                {
-                    maximum = collision.A;
-                }
-            }
-        }
-
-        private void SingleCollision(List<(double A, double B)> detectedCollisions, CollisionData data)
-        {
-            // Left collision
-            if (detectedCollisions[0].B < data.StartPoint)
-            {
-                if (data.IsVertical)
-                {
-                    this.AddConnection(data.StartX, detectedCollisions[0].B, data.EndX, data.EndY);
-                }
-                else
-                {
-                    this.AddConnection(detectedCollisions[0].B, data.StartY, data.EndX, data.EndY);
-                }
-            }
-            else
-            {
-                // Right collision
-                if (data.IsVertical)
-                {
-                    this.AddConnection(data.StartX, data.StartY, data.EndX, detectedCollisions[0].A);
-                }
-                else
-                {
-                    this.AddConnection(data.StartX, data.StartY, detectedCollisions[0].A, data.EndY);
-                }
-            }
-        }
-
-        private void AddConnection(double startX, double startY, double endX, double endY)
-        {
-            this._connections.Add(new Connection(new Point(startX, startY), new Point(endX, endY)));
+            var orientation = coords.IndexOf(closestPoint);
+            return (ConnectorOrientation)Enum.Parse(typeof(ConnectorOrientation), orientation.ToString());
         }
 
         private double CalcMedian(double a, double b)
@@ -476,28 +403,9 @@ namespace OrthogonalConnectorRouting
                    (y >= line.Start.Y && y <= line.End.Y || y >= line.End.Y && y <= line.Start.Y);
         }
 
-        private double Distance(Point source, Point target)
+        private double Distance(Models.Point source, Models.Point target)
         {
             return Math.Pow(target.X - source.X, 2) + Math.Pow(target.Y - source.Y, 2);
-        }
-
-        private class CollisionData
-        {
-            public double StartPoint { get; set; }
-
-            public double StartX { get; set; }
-
-            public double StartY { get; set; }
-
-            public double EndX { get; set; }
-
-            public double EndY { get; set; }
-
-            public double Maximum { get; set; }
-
-            public double OppositeSide { get; set; }
-
-            public bool IsVertical { get; set; }
         }
     }
 }
