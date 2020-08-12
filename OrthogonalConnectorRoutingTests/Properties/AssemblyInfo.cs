@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("OrthogonalConnectorRoutingTests")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCopyright("Copyright © 2020 Martin Fryml")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

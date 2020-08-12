@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Algorithm\Orthogonal_connector_routing.pdf" />
+    <None Include="..\README.md" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="_TODOs_.txt" />
