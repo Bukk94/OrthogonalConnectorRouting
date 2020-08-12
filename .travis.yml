@@ -1,2 +1,8 @@
 language: csharp
 solution: OrthogonalConnectorRouting_mono.sln
+install:
+  - nuget restore OrthogonalConnectorRouting_mono.sln
+script:
+  - dotnet restore
+  - msbuild
+  - dotnet test ./OrthogonalConnectorRoutingTests/bin/Debug/OrthogonalConnectorRouting.dll
