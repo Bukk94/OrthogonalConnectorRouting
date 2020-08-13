@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace OrthogonalConnectorRouting.Graph
 {
-    public interface IGraph<N, E, K> where N : INode<K>  
-                                     where E : IEdge<N, K>
-                                     where K : IComparable
+    internal interface IGraph<N, E, K> where N : INode<K>  
+                                       where E : IEdge<N, K>
+                                       where K : IComparable
     {
         int NodesCount { get; }
 
@@ -31,6 +31,7 @@ namespace OrthogonalConnectorRouting.Graph
 
         List<N> IntervalFind(double x1, double y1, double x2, double y2);
 
-        (List<N> pathNodes, List<E> pathEdges) ShortestPath(N startNode, N finishNode);
+        (List<N> pathNodes, List<E> pathEdges) ShortestPath<T>(N startNode, N finishNode)
+            where T : ShortestPathAlgorithm.ISearchAlgorithm, new();
     }
 }

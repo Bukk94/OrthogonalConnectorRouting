@@ -17,7 +17,8 @@ namespace OrthogonalConnectorRouting
 
         void ConstructGraph(IEnumerable<Models.Point> intersections);
 
-        ShortestGraphPath ShortestPath(Node startNode, Node finishNode);
+        ShortestGraphPath ShortestPathDijkstra(Node startNode, Node finishNode);
+        ShortestGraphPath ShortestPathAStar(Node startNode, Node finishNode);
 
         ShortestGraphPath CalculatePathForConnector(Connector targetConnector);
         #endregion

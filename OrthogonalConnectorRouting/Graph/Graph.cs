@@ -1,15 +1,15 @@
-﻿using OrthogonalConnectorRouting.PriorityQueue;
+﻿using OrthogonalConnectorRouting.Graph.ShortestPathAlgorithm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace OrthogonalConnectorRouting.Graph
 {
-    public class Graph<N, E, K> : IGraph<N, E, K> where N : INode<K>
-                                                  where E : IEdge<N, K>
-                                                  where K : IComparable
+    internal class Graph<N, E, K> : IGraph<N, E, K> where N : INode<K>
+                                                    where E : IEdge<N, K>
+                                                    where K : IComparable
     {
-        protected IPriorityBST<GraphVertex, K> tree;
+        private readonly IPriorityBST<GraphVertex, K> tree;
 
         public Graph()
         {
@@ -143,71 +143,18 @@ namespace OrthogonalConnectorRouting.Graph
             this.tree.Remove(this.tree.Find(node.X, node.Y));
         }
 
-        public (List<N> pathNodes, List<E> pathEdges) ShortestPath(N startNode, N finishNode)
+        public (List<N> pathNodes, List<E> pathEdges) ShortestPath<T>(N startNode, N finishNode)
+            where T : ISearchAlgorithm, new()
         {
-            IPriorityQueue<GraphVertex, double> minPQ = new PriorityQueue<GraphVertex, double>();
-            var totalCosts = new Dictionary<GraphVertex, double>();
-            var prevNodes = new Dictionary<GraphVertex, GraphVertex>();
-            var visited = new List<GraphVertex>();
-            var paths = new Dictionary<GraphVertex, GraphEdge>();
 
-            var treeStartNode = this.tree.Find(startNode.X, startNode.Y);
-            totalCosts.Add(treeStartNode, 0);
-            minPQ.Enqueue(treeStartNode, 0);
+            var searchAlgorithm = new T();
+            var results = searchAlgorithm.ShortestPath(this.tree, startNode, finishNode);
 
-            foreach (var node in this.tree.Nodes)
-            {
-                if (!node.Key.Equals(startNode.Key))
-                {
-                    totalCosts.Add(node, double.MaxValue);
-                    minPQ.Enqueue(node, double.MaxValue);
-                }
-            }
-
-            while (minPQ.Count > 0)
-            {
-                var newSmallest = minPQ.Dequeue();
-                visited.Add(newSmallest);
-
-                foreach (var edge in newSmallest.Edges)
-                {
-                    var possiblyUnvisitedNode = edge.Source == newSmallest ? edge.Destination : edge.Source;
-
-                    if (!visited.Contains(possiblyUnvisitedNode))
-                    {
-                        var altPath = totalCosts[newSmallest] + edge.Weight;
-
-                        if (totalCosts.ContainsKey(possiblyUnvisitedNode) && altPath < totalCosts[possiblyUnvisitedNode])
-                        {
-                            totalCosts[possiblyUnvisitedNode] = altPath;
-                            prevNodes[possiblyUnvisitedNode] = newSmallest;
-                            paths[possiblyUnvisitedNode] = edge;
-
-                            minPQ.UpdatePriority(possiblyUnvisitedNode, altPath);
-                        }
-                    }
-                }
-            }
-
-            var edges = new List<E>();
-            var last = this.tree.Find(finishNode.X, finishNode.Y);
-            var shortestPath = new List<N>();
-
-            while (prevNodes.ContainsKey(last))
-            {
-                edges.Add(paths[last].Data);
-                shortestPath.Add(last.Data);
-                last = prevNodes[last];
-            }
-
-            shortestPath.Add(startNode);
-            shortestPath.Reverse();
-
-            return (shortestPath, edges);
+            return results;
         }
 
         #region Private classes
-        protected class GraphVertex : INode<K>
+        internal class GraphVertex : INode<K>
         {
             public K Key { get; set; }
 
@@ -230,7 +177,7 @@ namespace OrthogonalConnectorRouting.Graph
             }
         }
 
-        protected class GraphEdge : IEdge<GraphVertex, K>
+        internal class GraphEdge : IEdge<GraphVertex, K>
         {
             public K Key => this.Data.Key;
 

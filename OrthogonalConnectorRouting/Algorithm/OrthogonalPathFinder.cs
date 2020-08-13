@@ -1,5 +1,6 @@
 ﻿using OrthogonalConnectorRouting.Algorithm;
 using OrthogonalConnectorRouting.Graph;
+using OrthogonalConnectorRouting.Graph.ShortestPathAlgorithm;
 using OrthogonalConnectorRouting.Models;
 using OrthogonalConnectorRouting.Models.InternalModels;
 using System;
@@ -96,9 +97,20 @@ namespace OrthogonalConnectorRouting
             }
         }
 
-        public ShortestGraphPath ShortestPath(Node startNode, Node finishNode)
+        public ShortestGraphPath ShortestPathDijkstra(Node startNode, Node finishNode)
         {
-            var (pathNodes, pathEdges) = this._graph.ShortestPath(startNode, finishNode);
+            return GetShortestPathInternal<DijkstraAlgorithm>(startNode, finishNode);
+        }
+
+        public ShortestGraphPath ShortestPathAStar(Node startNode, Node finishNode)
+        {
+            return GetShortestPathInternal<AStarAlgorithm>(startNode, finishNode);
+        }
+
+        private ShortestGraphPath GetShortestPathInternal<T>(Node startNode, Node finishNode)
+            where T : ISearchAlgorithm, new()
+        {
+            var (pathNodes, pathEdges) = this._graph.ShortestPath<T>(startNode, finishNode);
 
             return new ShortestGraphPath
             {
@@ -355,7 +367,8 @@ namespace OrthogonalConnectorRouting
 
         public ShortestGraphPath CalculatePathForConnector(Connector targetConnector)
         {
-            var shortestPath = this.ShortestPath(targetConnector.SourceNode, targetConnector.DestinatonNode);
+            // TODO: Allow to specify search algorithm
+            var shortestPath = this.ShortestPathDijkstra(targetConnector.SourceNode, targetConnector.DestinatonNode);
 
             foreach (var pathEdge in shortestPath.PathEdges)
             {
