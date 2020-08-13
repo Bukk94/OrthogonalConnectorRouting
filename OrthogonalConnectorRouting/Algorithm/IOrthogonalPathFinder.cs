@@ -1,4 +1,5 @@
-﻿using OrthogonalConnectorRouting.Graph;
+﻿using OrthogonalConnectorRouting.Enums;
+using OrthogonalConnectorRouting.Graph;
 using OrthogonalConnectorRouting.Models;
 using System.Collections.Generic;
 
@@ -8,7 +9,7 @@ namespace OrthogonalConnectorRouting
     {
         double Margin { get; set; }
 
-        AlgResults OrthogonalPath(IEnumerable<IInput> items, double maxWidth, double maxHeight, Connector targetConnector);
+        AlgResults OrthogonalPath(IEnumerable<IInput> items, double maxWidth, double maxHeight, SearchAlgorithm searchAlgorithm, Connector targetConnector);
 
         #region Algorithm steps
         IEnumerable<Connection> CreateLeadLines(IEnumerable<IInput> items, double maxWidth, double maxHeight);
@@ -17,10 +18,9 @@ namespace OrthogonalConnectorRouting
 
         void ConstructGraph(IEnumerable<Models.Point> intersections);
 
-        ShortestGraphPath ShortestPathDijkstra(Node startNode, Node finishNode);
-        ShortestGraphPath ShortestPathAStar(Node startNode, Node finishNode);
+        ShortestGraphPath ShortestPath(Node startNode, Node finishNode, SearchAlgorithm searchAlgorithm);
 
-        ShortestGraphPath CalculatePathForConnector(Connector targetConnector);
+        ShortestGraphPath CalculatePathForConnector(Connector targetConnector, SearchAlgorithm searchAlgorithm);
         #endregion
 
         ConnectorOrientation CalculateOrientation(IInput item, Models.Point relativeCoords);

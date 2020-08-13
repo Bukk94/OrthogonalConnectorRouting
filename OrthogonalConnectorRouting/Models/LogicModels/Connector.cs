@@ -1,4 +1,5 @@
-﻿using OrthogonalConnectorRouting.Graph;
+﻿using OrthogonalConnectorRouting.Enums;
+using OrthogonalConnectorRouting.Graph;
 using System.Collections.Generic;
 
 namespace OrthogonalConnectorRouting.Models

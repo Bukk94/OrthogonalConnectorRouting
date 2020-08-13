@@ -1,4 +1,4 @@
-﻿namespace OrthogonalConnectorRouting.Models
+﻿namespace OrthogonalConnectorRouting.Enums
 {
     public enum ConnectorOrientation
     {

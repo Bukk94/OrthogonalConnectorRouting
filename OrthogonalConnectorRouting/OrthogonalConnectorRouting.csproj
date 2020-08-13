@@ -40,6 +40,7 @@
     <Compile Include="Algorithm\CollisionDetection.cs" />
     <Compile Include="Algorithm\IOrthogonalPathFinder.cs" />
     <Compile Include="Algorithm\OrthogonalPathFinder.cs" />
+    <Compile Include="Enums\SearchAlgorithm.cs" />
     <Compile Include="Graph\BST\IPriorityBST.cs" />
     <Compile Include="Graph\BST\MethodExtensions.cs" />
     <Compile Include="Graph\BST\PriorityBST.cs" />
@@ -59,7 +60,7 @@
     <Compile Include="Models\IInput.cs" />
     <Compile Include="Models\InternalModels\CollisionData.cs" />
     <Compile Include="Models\LogicModels\Connector.cs" />
-    <Compile Include="Models\LogicModels\ConnectorOrientation.cs" />
+    <Compile Include="Enums\ConnectorOrientation.cs" />
     <Compile Include="Models\Point.cs" />
     <Compile Include="Models\ShortestPath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

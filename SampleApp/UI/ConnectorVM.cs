@@ -1,7 +1,7 @@
 ﻿using OrthogonalConnectorRouting;
+using OrthogonalConnectorRouting.Enums;
 using OrthogonalConnectorRouting.Models;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -75,7 +75,7 @@ namespace SampleApp
                 DestinationOrientation = ConnectorOrientation.Right
             };
 
-            var results = this._orthogonalPathFinder.OrthogonalPath(DesignerItems.ToList(), 800, 450, connector);
+            var results = this._orthogonalPathFinder.OrthogonalPath(DesignerItems.ToList(), 800, 450, SearchAlgorithm.Dijkstra, connector);
 
             this.Connections = new ObservableCollection<Connection>(results.Connections);
             this.Intersections = new ObservableCollection<OrthogonalConnectorRouting.Models.Point>(results.Intersections);
@@ -114,7 +114,7 @@ namespace SampleApp
             {
                 _lastConnector.Destinaton = rect.DataContext as IInput;
                 _lastConnector.DestinationOrientation = this._orthogonalPathFinder.CalculateOrientation(_lastConnector.Destinaton, relativeCoords);
-                this._orthogonalPathFinder.CalculatePathForConnector(_lastConnector);
+                this._orthogonalPathFinder.CalculatePathForConnector(_lastConnector, SearchAlgorithm.Dijkstra);
                 this.DrawPath(_lastConnector);
                 _lastConnector = null;
             }
