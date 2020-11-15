@@ -32,9 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithm\CollisionDetection.cs" />
@@ -66,11 +64,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Algorithm\Orthogonal_connector_routing.pdf" />
+    <None Include="Docs\Orthogonal_connector_routing.pdf" />
     <None Include="..\README.md" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="_TODOs_.txt" />
+    <Resource Include="Docs\TODOs.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

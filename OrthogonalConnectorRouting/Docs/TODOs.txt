@@ -1,0 +1,4 @@
+﻿// TODOs in this project
+
+1) Implement A*
+2) Make better connector input/output
