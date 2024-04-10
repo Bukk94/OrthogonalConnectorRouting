@@ -1,6 +1,6 @@
 ﻿# Orthogonal Connector Routing
 
-[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
+[![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Bukk94/OrthogonalConnectorRouting/blob/master/LICENSE)
 ![version](https://img.shields.io/badge/version-0.6-blue) 
 [![Build Status](https://travis-ci.com/Bukk94/OrthogonalConnectorRouting.svg?token=XTeWt6KEyExzbH1iNFWD&branch=master)](https://travis-ci.com/Bukk94/OrthogonalConnectorRouting)
 
